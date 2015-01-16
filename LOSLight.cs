@@ -56,7 +56,7 @@ namespace LOS {
 				DrawInvert();
 			}
 			else {
-				DrawImp();
+				Draw();
 			}
 		}
 
@@ -146,207 +146,259 @@ namespace LOS {
 		}
 
 		private void DrawInvert () {
-			List<Vector3> meshVertices = new List<Vector3>();
 			List<Vector3> invertMeshVertices = new List<Vector3>();
 			List<int> invertTriangles = new List<int>();
-
+			
 			bool raycastHitAtDegree0 = false;
-			bool raycastHitPreviously = false;
-			int invertRectBaseVertexIndex = 0;
-			
-			float distance = GetMinRaycastDistance();
+			Collider previousHitCollider = null;
 			RaycastHit hit;
-			
-			int previousVectexIndex = 0;
-			Vector3 hitPoint = Vector3.zero;
-			
-			meshVertices.Add(Vector3.zero);
-			
-			Vector2 viewboxSize = LOSManager.instance.viewboxSize;
-			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + Camera.main.transform.position;
-			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + Camera.main.transform.position;
-			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + Camera.main.transform.position;
-			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + Camera.main.transform.position;
-			
-			upperRight.z = 0;
-			upperLeft.z = 0;
-			lowerLeft.z = 0;
-			lowerRight.z = 0;
-			
-			float degreeUpperRight =  SMath.ClampDegree0To360(SMath.VectorToDegree(upperRight - _trans.position));
-			float degreeUpperLeft = SMath.ClampDegree0To360(SMath.VectorToDegree(upperLeft - _trans.position));
-			float degreeLowerLeft = SMath.ClampDegree0To360(SMath.VectorToDegree(lowerLeft - _trans.position));
-			float degreeLowerRight = SMath.ClampDegree0To360(SMath.VectorToDegree(lowerRight - _trans.position));
-			
+			int vertexIndex = 0;
+			int farVertexIndex = 0;
+			Vector3 previousHitPoint = Vector3.zero;
+
 			for (float degree=0; degree<360; degree+=degreeStepRough) {
 				Vector3 direction;
 				
-				if (degree < degreeUpperRight && degree+degreeStepRough > degreeUpperRight) {
-					direction = upperRight - _trans.position;
-				}
-				else if (degree < degreeUpperLeft && degree+degreeStepRough > degreeUpperLeft) {
-					direction = upperLeft - _trans.position;
-				}
-				else if (degree < degreeLowerLeft && degree+degreeStepRough > degreeLowerLeft) {
-					direction = lowerLeft - _trans.position;
-				}
-				else if (degree < degreeLowerRight && degree+degreeStepRough > degreeLowerRight) {
-					direction = lowerRight - _trans.position;
-				}
-				else {
-					direction = SMath.DegreeToUnitVector(degree);
-				}
+				direction = SMath.DegreeToUnitVector(degree);
 				
-				if (Physics.Raycast(_trans.position, direction, out hit, distance)) {
-					hitPoint = hit.point;
+				if (Physics.Raycast(_trans.position, direction, out hit, 8)) {		// Hit a collider.
+					Vector3 hitPoint = hit.point;
+					Collider hitCollider = hit.collider;
 
 					if (degree == 0) {
 						raycastHitAtDegree0 = true;
-						raycastHitPreviously = true;
-						invertMeshVertices.Add(hitPoint - _trans.position);
-						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref hitPoint);
-						invertMeshVertices.Add(hitPoint - _trans.position);
 					}
-					else if (!raycastHitPreviously) {
+
+					if (null == previousHitCollider) {
+						Vector3 farPoint = Vector3.zero;;
+						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref farPoint);
+						invertMeshVertices.Add(farPoint - _trans.position);
 						invertMeshVertices.Add(hitPoint - _trans.position);
-						invertMeshVertices.Add(meshVertices[meshVertices.Count-1]);		// previous added mesh vertex
-						raycastHitPreviously = true;
-					}
-				}
-				else {
-					LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref hitPoint);
-					
-					if (raycastHitPreviously) {
-						invertMeshVertices.Add(hitPoint - _trans.position);
-						invertMeshVertices.Add(meshVertices[meshVertices.Count-1]);
 						
-						AddNewTriangle(ref invertTriangles, invertRectBaseVertexIndex, invertRectBaseVertexIndex+2, invertRectBaseVertexIndex+1);
-						AddNewTriangle(ref invertTriangles, invertRectBaseVertexIndex, invertRectBaseVertexIndex+3, invertRectBaseVertexIndex+2);
-						invertRectBaseVertexIndex += 4;
-						raycastHitPreviously = false;
+						farVertexIndex = vertexIndex;
 					}
-				}
-				
-				meshVertices.Add(hitPoint - _trans.position);
-				int currentVertexIndex = meshVertices.Count - 1;
+					else if (hitCollider != previousHitCollider) {
+						Vector3 farPoint = Vector3.zero;;
+						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref farPoint);
+						invertMeshVertices.Add(farPoint - _trans.position);
+						invertMeshVertices.Add(hitPoint - _trans.position);
 
-				previousVectexIndex = currentVertexIndex;
-			}
+						AddNewTriangle(ref invertTriangles, vertexIndex+1, vertexIndex+2, farVertexIndex);
 
-			if (raycastHitPreviously) {
-				if (raycastHitAtDegree0) {
-					AddNewTriangle(ref invertTriangles, 0, 1, invertRectBaseVertexIndex);
-					AddNewTriangle(ref invertTriangles, 1, invertRectBaseVertexIndex, invertRectBaseVertexIndex+1);
+						farVertexIndex = vertexIndex + 2;
+
+						vertexIndex += 2;
+						AddNewTriangle(ref invertTriangles, vertexIndex-1, vertexIndex+1, farVertexIndex);
+					}
+					else {
+						invertMeshVertices.Add(hitPoint - _trans.position);
+						
+						vertexIndex++;
+						AddNewTriangle(ref invertTriangles, vertexIndex, vertexIndex+1, farVertexIndex);
+					}
+
+					previousHitPoint = hitPoint;
+					previousHitCollider = hitCollider;
 				}
 				else {
-					// TODO
+					if (previousHitCollider != null) {
+						if (vertexIndex > 0) {
+							Vector3 farPoint = Vector3.zero;
+							LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref farPoint);
+							invertMeshVertices.Add(farPoint - _trans.position);
+
+							AddNewTriangle(ref invertTriangles, vertexIndex+1, vertexIndex+2, farVertexIndex);
+							vertexIndex += 3;
+						}
+						else {
+							invertMeshVertices.Clear();
+							raycastHitAtDegree0 = false;
+						}
+					}
+
+					previousHitCollider = null;
 				}
 			}
 
-			Mesh mesh = new Mesh();
+			if (null != previousHitCollider) {
+				if (raycastHitAtDegree0) {
+					AddNewTriangle(ref invertTriangles, vertexIndex+1, 1, farVertexIndex);
+					AddNewTriangle(ref invertTriangles, 0, 1, farVertexIndex);
+				}
+				else {
+					Vector3 farPoint = Vector3.zero;
+					LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, new Vector3(1, 0, 0), ref farPoint);
+					invertMeshVertices.Add(farPoint - _trans.position);
 
+					AddNewTriangle(ref invertTriangles, vertexIndex+1, invertMeshVertices.Count-1, farVertexIndex);
+				}
+			}
+			
+			Mesh mesh = new Mesh();
+			
 			mesh.vertices = invertMeshVertices.ToArray();
 			mesh.triangles = invertTriangles.ToArray();
 			
 			_meshFilter.mesh = mesh;
 		}
 
-		private void DrawImp () {
-			List<Vector3> meshVertices = new List<Vector3>();
-			List<int> triangles = new List<int>();
-			
-			bool raycastHitPreviously = false;
-			
-			float distance = GetMinRaycastDistance();
+		private void DrawInvertImp () {
+			List<Vector3> invertMeshVertices = new List<Vector3>();
+			List<int> invertTriangles = new List<int>();
+
 			RaycastHit hit;
-			
-			int previousVectexIndex = 0;
-			Vector3 hitPoint = Vector3.zero;
-			Vector3 previousHitpointRough = Vector3.zero;
-			Vector3 previousHitpointDetail = Vector3.zero;
-			
-			meshVertices.Add(Vector3.zero);
+			Collider currentHitCollider = null;
+			Vector3 currentHitNormal = Vector3.zero;
+			bool raycastHitAtDegree0 = false;
+			int vertexIndex = 0;
+			Vector3 previousHitPoint = Vector3.zero;
+			bool biggerBase = false;
 
-			for (float degreeRough=0, previousDegreeRough=0; degreeRough<360; previousDegreeRough=degreeRough, degreeRough+=degreeStepRough) {
-				Vector3 direction = SMath.DegreeToUnitVector(degreeRough);
+			for (float degreeRough=0; degreeRough<360; degreeRough+=degreeStepRough) {
+				Vector3 direction;
 
-				if (Physics.Raycast(_trans.position, direction, out hit, distance)) {
-					Vector3 hitpointRough = hit.point;
+				direction = SMath.DegreeToUnitVector(degreeRough);
 
-					if (!raycastHitPreviously) {	// Then find the vertex in detail
-						bool detailRaycastHit = false;
+				if (Physics.Raycast(_trans.position, direction, out hit, 8)) {		// Hit a collider.
+					Vector3 hitPoint = hit.point;
+					Collider hitCollider = hit.collider;
+					Vector3 hitNormal = hit.normal;
 
-						for (float degreeDetail=previousDegreeRough; degreeDetail<degreeRough; degreeDetail+=degreeStepDetail) {
-							direction = SMath.DegreeToUnitVector(degreeDetail);
+					if (degreeRough == 0) {
+						raycastHitAtDegree0 = true;
+						invertMeshVertices.Add(hitPoint - _trans.position);
+						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref hitPoint);
+						invertMeshVertices.Add(hitPoint - _trans.position);
 
-							if (Physics.Raycast(_trans.position, direction, out hit, distance)) {
-								hitPoint = hit.point;
-								detailRaycastHit = true;
-								break;
-							}
-						}
-
-						if (!detailRaycastHit) {
-							hitPoint = hitpointRough;
-						}
-
-						meshVertices.Add(hitPoint - _trans.position);
-
-						raycastHitPreviously = true;
+						currentHitCollider = hitCollider;
+						currentHitNormal = hitNormal;
 					}
-
-					previousHitpointRough = hitpointRough;
-				}
-				else {
-					if (raycastHitPreviously) {
-						bool detailRaycastHit = false;
-
-						for (float degreeDetail=previousDegreeRough; degreeDetail<degreeRough; degreeDetail+=degreeStepDetail) {
+					else if (currentHitCollider == null) {
+						for (float degreeDetail=degreeRough-degreeStepRough; degreeDetail<degreeRough; degreeDetail+=degreeStepDetail) {
 							direction = SMath.DegreeToUnitVector(degreeDetail);
-
-							if (Physics.Raycast(_trans.position, direction, out hit, distance)) {
-								previousHitpointDetail = hit.point;
-								detailRaycastHit = true;
-							}
-							else {
+							
+							if (Physics.Raycast(_trans.position, direction, out hit, 8)) {
+								hitPoint = hit.point;
 								break;
 							}
 						}
 
-						if (detailRaycastHit) {
-							hitPoint = previousHitpointDetail;
+						invertMeshVertices.Add(hitPoint - _trans.position);
+						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref hitPoint);
+						invertMeshVertices.Add(hitPoint - _trans.position);
+					}
+					else if (hitCollider != currentHitCollider) {
+						Vector3 previousHitPointDetail = Vector3.zero;
+						for (float degreeDetail=degreeRough-degreeStepRough; degreeDetail<degreeRough; degreeDetail+=degreeStepDetail) {
+							direction = SMath.DegreeToUnitVector(degreeDetail);
+							
+							if (Physics.Raycast(_trans.position, direction, out hit, 8)) {
+								hitPoint = hit.point;
+
+								if (hit.collider != currentHitCollider) {
+									break;
+								}
+								previousHitPointDetail = hitPoint;
+							}
+						}
+
+						invertMeshVertices.Add(previousHitPointDetail - _trans.position);
+						invertMeshVertices.Add(hitPoint - _trans.position);		// The hit point on the new collider.
+						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref previousHitPointDetail);
+						invertMeshVertices.Add(previousHitPointDetail - _trans.position);
+
+
+						if (biggerBase) {
+							AddNewTriangle(ref invertTriangles, vertexIndex, vertexIndex+1, vertexIndex-1);
+							AddNewTriangle(ref invertTriangles, vertexIndex-1, vertexIndex+1, vertexIndex+3);
+							AddNewTriangle(ref invertTriangles, vertexIndex+1, vertexIndex+2, vertexIndex+3);
+							biggerBase = false;
+							vertexIndex += 2;
 						}
 						else {
-							hitPoint = previousHitpointRough;
+							AddNewTriangle(ref invertTriangles, vertexIndex, vertexIndex+2, vertexIndex+1);
+							AddNewTriangle(ref invertTriangles, vertexIndex+1, vertexIndex+2, vertexIndex+4);
+							AddNewTriangle(ref invertTriangles, vertexIndex+3, vertexIndex+2, vertexIndex+4);
+							vertexIndex += 3;
+						}
+					}
+					else if (hitNormal != currentHitNormal) {
+						for (float degreeDetail=degreeRough-degreeStepRough; degreeDetail<degreeRough; degreeDetail+=degreeStepDetail) {
+							direction = SMath.DegreeToUnitVector(degreeDetail);
+							
+							if (Physics.Raycast(_trans.position, direction, out hit, 8)) {
+								hitPoint = hit.point;
+
+								if (hitNormal != currentHitNormal) {
+									break;
+								}
+							}
 						}
 
-						meshVertices.Add(hitPoint - _trans.position);
-						AddNewTriangle(ref triangles, 0, meshVertices.Count-1, meshVertices.Count-2);
+						invertMeshVertices.Add(hitPoint - _trans.position);
 
-						raycastHitPreviously = false;
+						AddNewTriangle(ref invertTriangles, vertexIndex, vertexIndex+2, vertexIndex+1);
+						biggerBase = true;
+
+						vertexIndex += 2;
 					}
+
+					currentHitCollider = hitCollider;
+					currentHitNormal = hitNormal;
+
+					previousHitPoint = hitPoint;
+				}
+				else {		// Hit nothing
+					if (currentHitCollider != null) {
+						Vector3 hitPoint = previousHitPoint;
+						
+							// Detail scan
+						for (float degreeDetail=degreeRough-degreeStepRough; degreeDetail<degreeRough; degreeDetail+=degreeStepDetail) {
+							direction = SMath.DegreeToUnitVector(degreeDetail);
+							
+							if (!Physics.Raycast(_trans.position, direction, out hit, 8)) {
+								break;
+							}
+							else {
+								hitPoint = hit.point;
+							}
+						}
+
+						invertMeshVertices.Add(hitPoint - _trans.position);
+						LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, direction, ref hitPoint);
+						invertMeshVertices.Add(hitPoint - _trans.position);
+
+						if (biggerBase) {
+							AddNewTriangle(ref invertTriangles, vertexIndex, vertexIndex+1, vertexIndex-1);
+							AddNewTriangle(ref invertTriangles, vertexIndex-1, vertexIndex+1, vertexIndex+2);
+							biggerBase = false;
+							vertexIndex += 3;
+						}
+						else {
+							AddNewTriangle(ref invertTriangles, vertexIndex, vertexIndex+2, vertexIndex+1);
+							AddNewTriangle(ref invertTriangles, vertexIndex+1, vertexIndex+2, vertexIndex+3);
+							vertexIndex += 4;
+						}
+					}
+					currentHitCollider = null;
 				}
 			}
 
-			if (raycastHitPreviously) {
-				AddNewTriangle(ref triangles, 0, 1, meshVertices.Count-1);
+			if (currentHitCollider != null && raycastHitAtDegree0) {
+				AddNewTriangle(ref invertTriangles, 0, 1, vertexIndex);
+				AddNewTriangle(ref invertTriangles, 1, vertexIndex, vertexIndex+1);
 			}
 
 			Mesh mesh = new Mesh();
 			
-			mesh.vertices = meshVertices.ToArray();
-			mesh.triangles = triangles.ToArray();
+			mesh.vertices = invertMeshVertices.ToArray();
+			mesh.triangles = invertTriangles.ToArray();
 			
 			_meshFilter.mesh = mesh;
 		}
 
-		private void DrawInvertImp () {
-
-		}
-
 		private float GetMinRaycastDistance () {
 			Vector3 screenSize = SHelper.GetScreenSizeInWorld();
-			Vector2 screenSize2 = SMath.Vec3ToVec2(screenSize);
 			return screenSize.magnitude;
 		}
 
