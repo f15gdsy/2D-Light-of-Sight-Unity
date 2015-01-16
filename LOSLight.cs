@@ -263,11 +263,11 @@ namespace LOS {
 			triangles.Add(v2);
 		}
 
-		private void DebugDraw (List<Vector3> meshVertices, List<int> triangles) {
+		private void DebugDraw (List<Vector3> meshVertices, List<int> triangles, Color color, float time) {
 			for (int i=0; i<triangles.Count; i++) {
-				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[++i]], Color.yellow, 100);
-				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[++i]], Color.yellow, 100);
-				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[i-2]], Color.yellow, 100);
+				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[++i]], color, time);
+				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[++i]], color, time);
+				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[i-2]], color, time);
 			}
 		}
 	}
