@@ -13,6 +13,8 @@ namespace LOS {
 		private List<LOSObstacle> _obstacles;
 		private List<LOSObstacleLine> _viewbox;
 
+		public static float _tolerance = 0.1f;
+
 
 		public static LOSManager instance {
 			get {
@@ -22,8 +24,16 @@ namespace LOS {
 				return _instance;
 			}
 		}
-
 		public List<LOSObstacle> obstacles {get {return _obstacles;}}
+		public List<Vector3> viewboxCorners {
+			get {
+				List<Vector3> result = new List<Vector3>();
+				foreach (LOSObstacleLine line in _viewbox) {
+					result.Add(line.end);
+				}
+				return result;
+			}
+		}
 
 
 		private LOSManager () {
@@ -43,10 +53,10 @@ namespace LOS {
 			Vector2 lowerLeft = new Vector2(-viewboxSize.x, -viewboxSize.y) + center;
 			Vector2 lowerRight = new Vector2(viewboxSize.x, -viewboxSize.y) + center;
 
-			_viewbox[0].SetStartEnd(upperRight, upperLeft);		// up
-			_viewbox[1].SetStartEnd(upperLeft, lowerLeft);	// left
-			_viewbox[2].SetStartEnd(lowerLeft, lowerRight);	// down
-			_viewbox[3].SetStartEnd(lowerRight, upperRight);		// right
+			_viewbox[0].SetStartEnd(lowerRight, upperRight);		// right
+			_viewbox[1].SetStartEnd(upperRight, upperLeft);		// up
+			_viewbox[2].SetStartEnd(upperLeft, lowerLeft);	// left
+			_viewbox[3].SetStartEnd(lowerLeft, lowerRight);	// down
 		}
 
 		public bool GetCollisionPointWithViewBox (Vector3 origin, Vector3 direction, ref Vector3 point) {
@@ -79,6 +89,39 @@ namespace LOS {
 				}
 			}
 			return false;
+		}
+
+		// Works in counter-clock wise, pointA is the one with smaller angle against vector (1, 0)
+		public List<Vector3> GetViewboxCornersBetweenPoints (Vector3 pointA, Vector3 pointB, Vector3 origin) {
+			pointA.z = 0;
+			pointB.z = 0;
+			origin.z = 0;
+
+			float degreeA = SMath.VectorToDegree(pointA - origin);
+			float degreeB = SMath.VectorToDegree(pointB - origin);
+
+			if (degreeA == 360) {
+				degreeA = 0;
+			}
+			if (degreeB < degreeA) {
+				degreeB += 360;
+			}
+
+			Debug.Log(degreeA);
+			Debug.Log(degreeB);
+
+			List<Vector3> result = new List<Vector3>();
+
+			foreach (LOSObstacleLine line in _viewbox) {
+				Vector3 corner = line.end;
+
+				float degreeCorner = SMath.VectorToDegree(corner - origin);
+				if (degreeCorner > degreeA && degreeCorner < degreeB) {
+					result.Add(corner);
+				}
+			}
+
+			return result;
 		}
 		
 		public void AddObstacle (LOSObstacle obstacle) {
