@@ -7,8 +7,7 @@ namespace LOS {
 	public class LOSLight : MonoBehaviour {
 
 		public Material defaultMaterial;
-		public float degreeStepRough = 1;
-		public float degreeStepDetail = 0.1f;
+		public float degreeStep = 0.1f;
 		public bool invert = true;
 		public LayerMask obstacleLayer;
 
@@ -88,21 +87,19 @@ namespace LOS {
 			float degreeLowerLeft = SMath.ClampDegree0To360(SMath.VectorToDegree(lowerLeft - _trans.position));
 			float degreeLowerRight = SMath.ClampDegree0To360(SMath.VectorToDegree(lowerRight - _trans.position));
 
-			float degreeStep = degreeStepRough;
-
 			for (float degree=0; degree<360; degree+=degreeStep) {
 				Vector3 direction;
 
-				if (degree < degreeUpperRight && degree+degreeStepRough > degreeUpperRight) {
+				if (degree < degreeUpperRight && degree+degreeStep > degreeUpperRight) {
 					direction = upperRight - _trans.position;
 				}
-				else if (degree < degreeUpperLeft && degree+degreeStepRough > degreeUpperLeft) {
+				else if (degree < degreeUpperLeft && degree+degreeStep > degreeUpperLeft) {
 					direction = upperLeft - _trans.position;
 				}
-				else if (degree < degreeLowerLeft && degree+degreeStepRough > degreeLowerLeft) {
+				else if (degree < degreeLowerLeft && degree+degreeStep > degreeLowerLeft) {
 					direction = lowerLeft - _trans.position;
 				}
-				else if (degree < degreeLowerRight && degree+degreeStepRough > degreeLowerRight) {
+				else if (degree < degreeLowerRight && degree+degreeStep > degreeLowerRight) {
 					direction = lowerRight - _trans.position;
 				}
 				else {
@@ -160,7 +157,7 @@ namespace LOS {
 				invertMeshVertices.Add(corner - _trans.position);
 			}
 
-			for (float degree=0; degree<360; degree+=degreeStepRough) {
+			for (float degree=0; degree<360; degree+=degreeStep) {
 				Vector3 direction;
 				
 				direction = SMath.DegreeToUnitVector(degree);
