@@ -31,7 +31,7 @@ namespace LOS {
 			LOSManager.instance.RemoveObstacle(this);
 		}
 
-		protected virtual void LateUpdate () {
+		public void UpdatePositionAndRotation () {
 			_previousPosition = _trans.position;
 			_previousRotation = _trans.rotation;
 		}

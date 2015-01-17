@@ -48,6 +48,8 @@ namespace LOS {
 
 				DoDraw();
 			}
+
+			LOSManager.instance.UpdateObstaclesTransformData();
 		}
 
 		private void DoDraw () {

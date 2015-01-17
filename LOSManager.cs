@@ -140,7 +140,11 @@ namespace LOS {
 			return false;
 		}
 
-
+		public void UpdateObstaclesTransformData () {
+			foreach (LOSObstacle obstacle in _obstacles) {
+				obstacle.UpdatePositionAndRotation();
+			}
+		}
 
 		private float ClampDegree (float start, float degree) {
 			while (degree < start) {
