@@ -37,6 +37,8 @@ namespace LOS {
 				renderer.material = defaultMaterial;
 			}
 
+			_previousPosition = position2;
+
 			DoDraw();
 		}
 		
