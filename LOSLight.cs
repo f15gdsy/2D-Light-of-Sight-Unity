@@ -151,8 +151,14 @@ namespace LOS {
 			Collider previousHitCollider = null;
 			Collider colliderAtDegree0 = null;
 			RaycastHit hit;
-			int vertexIndex = 0;
+			int firstVertexIndex = 5;
+			int firstFarVertexIndex = 4;
+			int vertexIndex = 4;
 			int farVertexIndex = 0;
+
+			foreach (Vector3 corner in LOSManager.instance.viewboxCorners) {
+				invertMeshVertices.Add(corner - _trans.position);
+			}
 
 			for (float degree=0; degree<360; degree+=degreeStepRough) {
 				Vector3 direction;
@@ -198,17 +204,15 @@ namespace LOS {
 							break;
 						case 1:
 							Debug.Log("hererereh 1");
-							invertMeshVertices.Add(corners[0] - _trans.position);
-//							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, farVertexIndex, invertMeshVertices.Count-1);
-							vertexIndex++;
+							int cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
+							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, farVertexIndex, cornerIndex1);
 							break;
 						case 2:
 							Debug.Log("hererereh 2");
-							invertMeshVertices.Add(corners[0] - _trans.position);
-							invertMeshVertices.Add(corners[1] - _trans.position);
-							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, invertMeshVertices.Count-1, invertMeshVertices.Count-2);
-							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, farVertexIndex, invertMeshVertices.Count-1);
-							vertexIndex += 2;
+							cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
+							int cornerIndex2 = GetCorrectCornerIndex(invertMeshVertices, corners[1]);
+							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, cornerIndex2, cornerIndex1);
+							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, farVertexIndex, cornerIndex2);
 							break;
 						default:
 							Debug.LogError("Error!");
@@ -242,16 +246,14 @@ namespace LOS {
 							case 0:
 								break;
 							case 1:
-								invertMeshVertices.Add(corners[0] - _trans.position);
-								AddNewTriangle(ref invertTriangles, vertexIndex+2, vertexIndex+3, farVertexIndex);
-								vertexIndex++;
+								int cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
+								AddNewTriangle(ref invertTriangles, vertexIndex+2, cornerIndex1, farVertexIndex);
 								break;
 							case 2:
-								invertMeshVertices.Add(corners[0] - _trans.position);
-								invertMeshVertices.Add(corners[1] - _trans.position);
-								AddNewTriangle(ref invertTriangles, vertexIndex+4, vertexIndex+3, farVertexIndex);
-								AddNewTriangle(ref invertTriangles, vertexIndex+4, farVertexIndex, vertexIndex+2);
-								vertexIndex += 2;
+								cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
+								int cornerIndex2 = GetCorrectCornerIndex(invertMeshVertices, corners[1]);
+								AddNewTriangle(ref invertTriangles, cornerIndex2, cornerIndex1, farVertexIndex);
+								AddNewTriangle(ref invertTriangles, cornerIndex2, farVertexIndex, vertexIndex+2);
 								break;
 							default:
 								Debug.LogError("Error!");
@@ -261,7 +263,8 @@ namespace LOS {
 							vertexIndex += 3;
 						}
 						else {
-							invertMeshVertices.Clear();
+							invertMeshVertices.RemoveAt(5);
+							invertMeshVertices.RemoveAt(4);
 							raycastHitAtDegree0 = false;
 							colliderAtDegree0 = null;
 						}
@@ -273,23 +276,22 @@ namespace LOS {
 
 			if (null != previousHitCollider) {
 				Vector3 farVertexAtDegree0 = Vector3.zero;
-				int degree0Index = 0;
-				int firstCornerIndex = vertexIndex+2;
+				int degree0Index = firstFarVertexIndex;
 
 				if (raycastHitAtDegree0) {
 
 					if (colliderAtDegree0 == previousHitCollider) {
 						Debug.Log("Here");
-						AddNewTriangle(ref invertTriangles, vertexIndex+1, 1, farVertexIndex);
-						AddNewTriangle(ref invertTriangles, 0, farVertexIndex, 1);
+						AddNewTriangle(ref invertTriangles, vertexIndex+1, firstVertexIndex, farVertexIndex);
+						AddNewTriangle(ref invertTriangles, firstFarVertexIndex, farVertexIndex, firstVertexIndex);
 					}
 					else {
 						Debug.Log("Here2");
-						AddNewTriangle(ref invertTriangles, vertexIndex+1, 1, 0);
-						AddNewTriangle(ref invertTriangles, vertexIndex+1, 0, farVertexIndex);
+						AddNewTriangle(ref invertTriangles, vertexIndex+1, firstVertexIndex, firstFarVertexIndex);
+						AddNewTriangle(ref invertTriangles, vertexIndex+1, firstFarVertexIndex, farVertexIndex);
 
 					}
-					farVertexAtDegree0 = invertMeshVertices[0] + _trans.position;
+					farVertexAtDegree0 = invertMeshVertices[firstFarVertexIndex] + _trans.position;
 				}
 				else {
 					Debug.Log("Here3");
@@ -301,7 +303,6 @@ namespace LOS {
 
 					farVertexAtDegree0 = farPoint;
 					degree0Index = invertMeshVertices.Count-1;
-					firstCornerIndex = vertexIndex + 3;
 				}
 
 				Vector3 previousFarPoint = invertMeshVertices[farVertexIndex] + _trans.position;
@@ -312,16 +313,12 @@ namespace LOS {
 				case 0:
 					break;
 				case 1:
-					invertMeshVertices.Add(corners[0] - _trans.position);
-					AddNewTriangle(ref invertTriangles, degree0Index, firstCornerIndex, farVertexIndex);
-					vertexIndex++;
+					int cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
+//					invertMeshVertices.Add(corners[0] - _trans.position);
+					AddNewTriangle(ref invertTriangles, degree0Index, cornerIndex1, farVertexIndex);
 					break;
 				case 2:
-					invertMeshVertices.Add(corners[0] - _trans.position);
-					invertMeshVertices.Add(corners[1] - _trans.position);
-					AddNewTriangle(ref invertTriangles, vertexIndex+4, vertexIndex+3, farVertexIndex);
-					AddNewTriangle(ref invertTriangles, vertexIndex+4, farVertexIndex, vertexIndex+2);
-					vertexIndex += 2;
+					Debug.Log("When it comes here?");
 					break;
 				default:
 					Debug.LogError("Error!");
@@ -346,6 +343,17 @@ namespace LOS {
 			triangles.Add(v0);
 			triangles.Add(v1);
 			triangles.Add(v2);
+		}
+
+		private int GetCorrectCornerIndex (List<Vector3> vertices, Vector3 corner) {
+			for (int i=0; i<4; i++) {
+				if (vertices[i] == corner - _trans.position) {
+					Debug.Log("i " + i);
+					return i;
+				}
+			}
+			Debug.Log("i -1");
+			return -1;
 		}
 
 		private void DebugDraw (List<Vector3> meshVertices, List<int> triangles, Color color, float time) {
