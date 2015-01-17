@@ -107,9 +107,6 @@ namespace LOS {
 				degreeB += 360;
 			}
 
-			Debug.Log(degreeA);
-			Debug.Log(degreeB);
-
 			List<Vector3> result = new List<Vector3>();
 
 			foreach (LOSObstacleLine line in _viewbox) {

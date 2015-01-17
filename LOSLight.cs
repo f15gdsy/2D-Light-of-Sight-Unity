@@ -192,7 +192,7 @@ namespace LOS {
 
 						int previousFarVertexIndex = farVertexIndex;
 						farVertexIndex = vertexIndex + 2;
-						Debug.Log("!!!!!!");
+
 						vertexIndex += 2;
 						AddNewTriangle(ref invertTriangles, vertexIndex-1, vertexIndex+1, farVertexIndex);
 
@@ -203,12 +203,10 @@ namespace LOS {
 						case 0:
 							break;
 						case 1:
-							Debug.Log("hererereh 1");
 							int cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
 							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, farVertexIndex, cornerIndex1);
 							break;
 						case 2:
-							Debug.Log("hererereh 2");
 							cornerIndex1 = GetCorrectCornerIndex(invertMeshVertices, corners[0]);
 							int cornerIndex2 = GetCorrectCornerIndex(invertMeshVertices, corners[1]);
 							AddNewTriangle(ref invertTriangles, previousFarVertexIndex, cornerIndex2, cornerIndex1);
@@ -239,9 +237,8 @@ namespace LOS {
 
 							Vector3 previousFarPoint = invertMeshVertices[farVertexIndex] + _trans.position;
 
-							Debug.Log("---------------");
 							List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(previousFarPoint, farPoint, _trans.position);
-							Debug.Log(corners.Count);
+
 							switch (corners.Count) {
 							case 0:
 								break;
@@ -281,12 +278,10 @@ namespace LOS {
 				if (raycastHitAtDegree0) {
 
 					if (colliderAtDegree0 == previousHitCollider) {
-						Debug.Log("Here");
 						AddNewTriangle(ref invertTriangles, vertexIndex+1, firstVertexIndex, farVertexIndex);
 						AddNewTriangle(ref invertTriangles, firstFarVertexIndex, farVertexIndex, firstVertexIndex);
 					}
 					else {
-						Debug.Log("Here2");
 						AddNewTriangle(ref invertTriangles, vertexIndex+1, firstVertexIndex, firstFarVertexIndex);
 						AddNewTriangle(ref invertTriangles, vertexIndex+1, firstFarVertexIndex, farVertexIndex);
 
@@ -294,7 +289,6 @@ namespace LOS {
 					farVertexAtDegree0 = invertMeshVertices[firstFarVertexIndex] + _trans.position;
 				}
 				else {
-					Debug.Log("Here3");
 					Vector3 farPoint = Vector3.zero;
 					LOSManager.instance.GetCollisionPointWithViewBox(_trans.position, new Vector3(1, 0, 0), ref farPoint);
 					invertMeshVertices.Add(farPoint - _trans.position);
@@ -308,7 +302,7 @@ namespace LOS {
 				Vector3 previousFarPoint = invertMeshVertices[farVertexIndex] + _trans.position;
 
 				List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(previousFarPoint, farVertexAtDegree0, _trans.position);
-				Debug.Log(corners.Count);
+
 				switch (corners.Count) {
 				case 0:
 					break;
@@ -348,11 +342,9 @@ namespace LOS {
 		private int GetCorrectCornerIndex (List<Vector3> vertices, Vector3 corner) {
 			for (int i=0; i<4; i++) {
 				if (vertices[i] == corner - _trans.position) {
-					Debug.Log("i " + i);
 					return i;
 				}
 			}
-			Debug.Log("i -1");
 			return -1;
 		}
 
