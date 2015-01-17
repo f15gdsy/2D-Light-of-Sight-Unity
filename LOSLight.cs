@@ -14,6 +14,7 @@ namespace LOS {
 		private Transform _trans;
 		private MeshFilter _meshFilter;
 		private Vector2 _previousPosition;
+		private float _raycastDistance;
 
 		public Vector2 position2 {get {return new Vector2(_trans.position.x, _trans.position.y);}}
 
@@ -24,6 +25,8 @@ namespace LOS {
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
 			LOSManager.instance.viewboxSize = screenSize;
 			LOSManager.instance.UpdateViewingBox(Camera.main.transform.position);
+
+			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
 		}
 
 		void Start () {
@@ -166,7 +169,7 @@ namespace LOS {
 				
 				direction = SMath.DegreeToUnitVector(degree);
 				
-				if (Physics.Raycast(_trans.position, direction, out hit, 8, obstacleLayer)) {		// Hit a collider.
+				if (Physics.Raycast(_trans.position, direction, out hit, _raycastDistance, obstacleLayer)) {		// Hit a collider.
 					Vector3 hitPoint = hit.point;
 					Collider hitCollider = hit.collider;
 
