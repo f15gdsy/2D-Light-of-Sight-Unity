@@ -53,6 +53,7 @@ namespace LOS {
 			}
 
 			LOSManager.instance.UpdateObstaclesTransformData();
+			LOSManager.instance.UpdateViewingBox(Camera.main.transform.position);
 		}
 
 		private void DoDraw () {
