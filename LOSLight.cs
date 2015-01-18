@@ -10,11 +10,16 @@ namespace LOS {
 		public float degreeStep = 0.1f;
 		public bool invert = true;
 		public LayerMask obstacleLayer;
+		public float lightAngle = 0;
+		public float faceAngle = 0;
 
 		private Transform _trans;
 		private MeshFilter _meshFilter;
 		private Vector2 _previousPosition;
+		private float _previousRotation;
 		private float _raycastDistance;
+		private float _startAngle;
+		private float _endAngle;
 
 		public Vector2 position2 {get {return new Vector2(_trans.position.x, _trans.position.y);}}
 
@@ -25,6 +30,8 @@ namespace LOS {
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
 			LOSManager.instance.viewboxSize = screenSize;
 			LOSManager.instance.UpdateViewingBox(Camera.main.transform.position);
+
+			lightAngle = SMath.ClampDegree0To360(lightAngle);
 
 			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
 		}
@@ -46,8 +53,9 @@ namespace LOS {
 		}
 		
 		void LateUpdate () {
-			if (SHelper.CheckWithinScreen(_trans.position) && (LOSManager.instance.CheckDirty() || !_previousPosition.Equals(position2))) {
+			if (SHelper.CheckWithinScreen(_trans.position) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
 				_previousPosition = position2;
+				_previousRotation = faceAngle;
 
 				DoDraw();
 			}
@@ -56,7 +64,15 @@ namespace LOS {
 			LOSManager.instance.UpdateViewingBox(Camera.main.transform.position);
 		}
 
+		public bool CheckDirty () {
+			Debug.Log(!_previousPosition.Equals(position2) || !_previousRotation.Equals(faceAngle));
+			return !_previousPosition.Equals(position2) || !_previousRotation.Equals(faceAngle);
+		}
+
 		private void DoDraw () {
+			_startAngle = lightAngle == 0 ? 0 : faceAngle - lightAngle / 2;
+			_endAngle = lightAngle == 0 ? 360 : faceAngle + lightAngle / 2;
+
 			if (invert) {
 				DrawInvert();
 			}
@@ -95,7 +111,7 @@ namespace LOS {
 			float degreeLowerLeft = SMath.ClampDegree0To360(SMath.VectorToDegree(lowerLeft - _trans.position));
 			float degreeLowerRight = SMath.ClampDegree0To360(SMath.VectorToDegree(lowerRight - _trans.position));
 
-			for (float degree=0; degree<360; degree+=degreeStep) {
+			for (float degree=_startAngle; degree<_endAngle; degree+=degreeStep) {
 				Vector3 direction;
 
 				if (degree < degreeUpperRight && degree+degreeStep > degreeUpperRight) {
@@ -138,7 +154,9 @@ namespace LOS {
 				previousVectexIndex = currentVertexIndex;
 			}
 
-			AddNewTriangle(ref triangles, 0, 1, previousVectexIndex);
+			if (lightAngle == 0) {
+				AddNewTriangle(ref triangles, 0, 1, previousVectexIndex);
+			}
 	
 			Mesh mesh = new Mesh();
 
