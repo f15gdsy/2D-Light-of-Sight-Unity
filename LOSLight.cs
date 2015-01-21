@@ -14,6 +14,8 @@ namespace LOS {
 		public float faceAngle = 0;
 
 		private Transform _trans;
+		private Transform _cameraTrans;
+		private Camera _camera;
 		private MeshFilter _meshFilter;
 		private Vector2 _previousPosition;
 		private float _previousRotation;
@@ -21,15 +23,19 @@ namespace LOS {
 		private float _startAngle;
 		private float _endAngle;
 
+
 		public Vector2 position2 {get {return new Vector2(_trans.position.x, _trans.position.y);}}
 
 
 		void Awake () {
 			_trans = transform;
+			_cameraTrans = Camera.main.transform;
+
+			_camera = Camera.main;
 
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
 			LOSManager.instance.viewboxSize = screenSize;
-			LOSManager.instance.UpdateViewingBox(Camera.main.transform.position);
+			LOSManager.instance.UpdateViewingBox(_cameraTrans.position);
 
 			lightAngle = SMath.ClampDegree0To360(lightAngle);
 
@@ -53,7 +59,7 @@ namespace LOS {
 		}
 		
 		void LateUpdate () {
-			if (SHelper.CheckWithinScreen(_trans.position) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
+			if (SHelper.CheckWithinScreen(_trans.position, _camera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
 				_previousPosition = position2;
 				_previousRotation = faceAngle;
 
@@ -61,7 +67,7 @@ namespace LOS {
 			}
 
 			LOSManager.instance.UpdateObstaclesTransformData();
-			LOSManager.instance.UpdateViewingBox(Camera.main.transform.position);
+			LOSManager.instance.UpdateViewingBox(_cameraTrans.position);
 		}
 
 		public bool CheckDirty () {
@@ -95,10 +101,10 @@ namespace LOS {
 			meshVertices.Add(Vector3.zero);
 		
 			Vector2 viewboxSize = LOSManager.instance.viewboxSize;
-			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + Camera.main.transform.position;
-			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + Camera.main.transform.position;
-			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + Camera.main.transform.position;
-			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + Camera.main.transform.position;
+			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + _cameraTrans.position;
+			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + _cameraTrans.position;
+			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + _cameraTrans.position;
+			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + _cameraTrans.position;
 
 			upperRight.z = 0;
 			upperLeft.z = 0;
@@ -205,7 +211,7 @@ namespace LOS {
 					lastFarPointIndex = invertAngledMeshVertices.Count - 1;
 				}
 				
-				if (Physics.Raycast(_trans.position, direction, out hit, _raycastDistance, obstacleLayer)) {		// Hit a collider.
+				if (Physics.Raycast(_trans.position, direction, out hit, _raycastDistance, obstacleLayer) && CheckRaycastHit(hit)) {		// Hit a collider.
 					Vector3 hitPoint = hit.point;
 					Collider hitCollider = hit.collider;
 
@@ -397,6 +403,11 @@ namespace LOS {
 				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[++i]], color, time);
 				Debug.DrawLine(meshVertices[triangles[i]], meshVertices[triangles[i-2]], color, time);
 			}
+		}
+
+		private bool CheckRaycastHit (RaycastHit hit) {
+			Vector3 hitPoint = hit.point;
+			return SHelper.CheckWithinScreen(hitPoint, _camera);
 		}
 	}
 }
