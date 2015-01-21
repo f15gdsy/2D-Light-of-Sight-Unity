@@ -73,12 +73,12 @@ namespace LOS {
 			_endAngle = lightAngle == 0 ? 360 : faceAngle + lightAngle / 2;
 
 			if (invert) {
-				if (_startAngle == 0 && _endAngle == 360) {
-					DrawInvert();
-				}
-				else {
+//				if (_startAngle == 0 && _endAngle == 360) {
+//					DrawInvert();
+//				}
+//				else {
 					DrawInvertAngled();
-				}
+//				}
 			}
 			else {
 				Draw();
@@ -373,6 +373,7 @@ namespace LOS {
 			int previousFarPointIndex = -1;
 			int closePointIndex = -1;
 			int previousClosePointIndex = -1;
+			int closePointAtDegree0Index = -1;
 			RaycastHit hit;
 
 
@@ -415,6 +416,10 @@ namespace LOS {
 						invertAngledMeshVertices.Add(hitPoint - _trans.position);
 						previousClosePointIndex = closePointIndex;
 						closePointIndex = invertAngledMeshVertices.Count - 1;
+
+						if (degree == 0) {
+							closePointAtDegree0Index = closePointIndex;
+						}
 					}
 					else if (degree + degreeStep >= _endAngle) {
 						previousFarPointIndex = farPointIndex;
@@ -478,8 +483,15 @@ namespace LOS {
 				AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
 			}
 
-			// Add triangles between outside of view.
-			AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, lastFarPointIndex, firstFarPointIndex, 0);
+			if (_startAngle == 0 && _endAngle == 360) {
+				if (previousCollider != null && closePointAtDegree0Index != -1) {
+					AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+					AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, lastFarPointIndex);
+				}
+			}
+			else {	// Add triangles between outside of view.
+				AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, lastFarPointIndex, firstFarPointIndex, 0);
+			}
 
 			Mesh mesh = new Mesh();
 			
