@@ -103,22 +103,37 @@ namespace LOS {
 			if (degreeA == 360) {
 				degreeA = 0;
 			}
-			if (degreeB < degreeA) {
-				degreeB += 360;
+			if (degreeA > degreeB) {
+				degreeA -= 360;
 			}
 
-			List<Vector3> result = new List<Vector3>();
+			Dictionary<float, Vector3> tempResults = new Dictionary<float, Vector3>();
 
 			foreach (LOSObstacleLine line in _viewbox) {
 				Vector3 corner = line.end;
 
+				float degreeToA = 0;
 				float degreeCorner = SMath.VectorToDegree(corner - origin);
-				if (degreeCorner > degreeA && degreeCorner < degreeB) {
-					result.Add(corner);
+				if (((degreeToA = (degreeCorner - degreeA)) > 0 && degreeCorner < degreeB) ||
+				    ((degreeToA = (degreeCorner - 360 - degreeA)) > 0 && degreeCorner - 360 < degreeB) ||
+				    ((degreeToA = (degreeCorner + 360 - degreeA)) > 0 && degreeCorner + 360 < degreeB)) {
+					tempResults.Add(degreeToA, corner);
 				}
 			}
 
-			return result;
+			List<float> degreesToA = new List<float>();
+			
+			foreach (float degreeToA in tempResults.Keys) {
+				degreesToA.Add(degreeToA);
+			}
+			degreesToA.Sort();
+
+			List<Vector3> results = new List<Vector3>();
+			foreach (float degreeToA in degreesToA) {
+				results.Add(tempResults[degreeToA]);
+			}
+
+			return results;
 		}
 		
 		public void AddObstacle (LOSObstacle obstacle) {
