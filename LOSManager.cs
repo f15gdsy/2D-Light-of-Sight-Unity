@@ -65,7 +65,7 @@ namespace LOS {
 				Vector2 s = line.end - line.start;
 
 				Vector2 p = SMath.Vec3ToVec2(origin);
-				Vector2 r = SMath.Vec3ToVec2(direction).normalized;
+				Vector2 r = SMath.Vec3ToVec2(direction);
 
 				// The intersection is where q + u*s == p + t*r, and 0 <= u <= 1 && 0 <= t
 				// t = (q − p) × s / (r × s)
@@ -106,7 +106,7 @@ namespace LOS {
 			if (degreeA > degreeB) {
 				degreeA -= 360;
 			}
-
+		
 			Dictionary<float, Vector3> tempResults = new Dictionary<float, Vector3>();
 
 			foreach (LOSObstacleLine line in _viewbox) {
@@ -153,6 +153,11 @@ namespace LOS {
 				}
 			}
 			return false;
+		}
+
+		public bool CheckPointWithinViewingBox (Vector2 point, Vector2 center) {
+			return !(point.x <= -viewboxSize.x + center.x || point.x >= viewboxSize.x + center.x ||
+			        point.y <= -viewboxSize.y + center.y || point.y >= viewboxSize.y + center.y);
 		}
 
 		public void UpdateObstaclesTransformData () {
