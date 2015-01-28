@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace LOS {
 
-	public class LOSLight : MonoBehaviour {
+	public class LOSLight : LOSObjectBase {
 
 		public Material defaultMaterial;
 		public float degreeStep = 0.1f;
@@ -13,32 +13,20 @@ namespace LOS {
 		public float lightAngle = 0;
 		public float faceAngle = 0;
 
-		private Transform _trans;
-		private Transform _cameraTrans;
-		private Camera _camera;
 		private MeshFilter _meshFilter;
-		private Vector2 _previousPosition;
-		private float _previousRotation;
+		private float _previousAngle;
 		private float _raycastDistance;
 		private float _startAngle;
 		private float _endAngle;
 
 
-		public Vector2 position2 {get {return new Vector2(_trans.position.x, _trans.position.y);}}
 
-
-		void Awake () {
-			_trans = transform;
-			_cameraTrans = Camera.main.transform;
-
-			_camera = Camera.main;
-
-			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
-			LOSManager.instance.viewboxSize = screenSize;
-			LOSManager.instance.UpdateViewingBox(_cameraTrans.position);
+		protected override void Awake () {
+			base.Awake();
 
 			lightAngle = SMath.ClampDegree0To360(lightAngle);
 
+			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
 			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
 		}
 
@@ -53,25 +41,23 @@ namespace LOS {
 				renderer.material = defaultMaterial;
 			}
 
-			_previousPosition = position2;
-
 			DoDraw();
 		}
 		
 		void LateUpdate () {
-			if (SHelper.CheckWithinScreen(_trans.position, _camera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
-				_previousPosition = position2;
-				_previousRotation = faceAngle;
+			if (SHelper.CheckWithinScreen(_trans.position, LOSManager.instance.lightCamera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
+				UpdatePreviousInfo();
+				_previousAngle = faceAngle;
 
 				DoDraw();
 			}
-
-			LOSManager.instance.UpdateObstaclesTransformData();
-			LOSManager.instance.UpdateViewingBox(_cameraTrans.position);
+//
+//			LOSManager.instance.UpdateObstaclesTransformData();
+//			LOSManager.instance.UpdateViewingBox(_cameraTrans.position);
 		}
 
-		public bool CheckDirty () {
-			return !_previousPosition.Equals(position2) || !_previousRotation.Equals(faceAngle);
+		public override bool CheckDirty () {
+			return !_previousPosition.Equals(position) || !_previousAngle.Equals(faceAngle);
 		}
 
 		private void DoDraw () {
@@ -101,10 +87,10 @@ namespace LOS {
 			meshVertices.Add(Vector3.zero);
 		
 			Vector2 viewboxSize = LOSManager.instance.viewboxSize;
-			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + _cameraTrans.position;
-			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + _cameraTrans.position;
-			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + _cameraTrans.position;
-			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + _cameraTrans.position;
+			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
+			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
+			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
+			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
 
 			upperRight.z = 0;
 			upperLeft.z = 0;

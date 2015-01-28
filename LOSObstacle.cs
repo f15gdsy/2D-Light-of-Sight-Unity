@@ -4,21 +4,13 @@ using System.Collections.Generic;
 
 namespace LOS {
 
-	public class LOSObstacle : MonoBehaviour {
-
-		public bool isStatic = true;
-
-		protected Transform _trans;
-		protected Vector3 _previousPosition;
-		protected Quaternion _previousRotation;
-
+	public class LOSObstacle : LOSObjectBase {
 
 		public virtual List<Vector2> vertices {get; set;}
 
 
-		protected virtual void Awake () {
-			_trans = transform;
-			_previousPosition = _trans.position;
+		protected override  void Awake () {
+			base.Awake();
 		}
 
 		protected virtual void Start () {}
@@ -28,17 +20,11 @@ namespace LOS {
 		}
 
 		protected virtual void OnDisable () {
-			LOSManager.instance.RemoveObstacle(this);
+			if (LOSManager.instance != null) {		// Have to check in case the manager is destroyed when scene end.
+				LOSManager.instance.RemoveObstacle(this);
+			}
 		}
 
-		public void UpdatePositionAndRotation () {
-			_previousPosition = _trans.position;
-			_previousRotation = _trans.rotation;
-		}
-
-		public bool CheckDirty () {
-			return !_trans.position.Equals(_previousPosition) || !_trans.rotation.Equals(_previousRotation);
-		}
 	}
 
 }
