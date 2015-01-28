@@ -180,6 +180,7 @@ namespace LOS {
 			Vector3 lastFarPoint = Vector3.zero;
 			int firstFarPointIndex = -1;
 			int lastFarPointIndex = -1;
+			int lastClosePointIndex = -1;
 			int farPointIndex = -1;
 			int previousFarPointIndex = -1;
 			int closePointIndex = -1;
@@ -238,8 +239,14 @@ namespace LOS {
 						closePointIndex = invertAngledMeshVertices.Count - 1;
 
 						colliderClosePointCount++;
-						if (previousCollider != hitCollider) {
+						if (previousCollider != hitCollider && null != previousCollider) {
 							colliderClosePointCount = 1;
+
+							if (_startAngle == 0 && _endAngle == 360) {
+								AddNewTriangle(ref invertAngledTriangles, previousFarPointIndex, previousClosePointIndex, lastFarPointIndex);
+								AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, lastFarPointIndex);
+								AddNewTrianglesBetweenPoints2Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex);
+							}
 						}
 					}
 					else {
@@ -318,29 +325,45 @@ namespace LOS {
 				}
 			}
 
-			if (previousCollider != null) {
-				if (colliderClosePointCount >= 2) {
-					Debug.Log("Hererere");
-					AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, closePointIndex);
-					AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
-				}
-				else if (previousFarPointIndex >= 0){
-					Debug.Log("Hererere2");
-					AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, previousClosePointIndex);
-					AddNewTriangle(ref invertAngledTriangles, closePointIndex, lastFarPointIndex, previousClosePointIndex);
-				}
-			}
+
 
 			if (_startAngle == 0 && _endAngle == 360) {
-				Debug.Log(previousCollider != null && closePointAtDegree0Index != -1);
-				if (previousCollider != null && closePointAtDegree0Index != -1) {
-					AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
-					AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, lastFarPointIndex);
+				if (previousCollider != null) {
+					if (closePointAtDegree0Index == -1) {
+						AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, closePointIndex);
+					}
+					else {
+						if (colliderClosePointCount > 1) {
+							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+							AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
+							AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, firstFarPointIndex, closePointIndex);
+						}
+						else {
+							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+							AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, lastFarPointIndex);
+//							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+//							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, lastFarPointIndex);
+						}
+					}
+//					AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+//					AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, lastFarPointIndex);
+
+//					AddNewTrianglesBetweenPoints2Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, firstFarPointIndex);
 				}
 			}
 			else {	// Add triangles between outside of view.
-				Debug.Log("Hererere3");
 				AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, lastFarPointIndex, firstFarPointIndex, 0);
+
+				if (previousCollider != null) {
+					if (colliderClosePointCount >= 2) {
+						AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, closePointIndex);
+						AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
+					}
+					else if (previousFarPointIndex >= 0){
+						AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, previousClosePointIndex);
+						AddNewTriangle(ref invertAngledTriangles, closePointIndex, lastFarPointIndex, previousClosePointIndex);
+					}
+				}
 			}
 
 			Mesh mesh = new Mesh();
