@@ -574,20 +574,26 @@ namespace LOS {
 					else if (degree + degreeStep >= _endAngle) {
 						previousFarPointIndex = farPointIndex;
 						farPointIndex = lastFarPointIndex;
-						
-						invertAngledMeshVertices.Add(hitPoint - position);
-						previousClosePointIndex = closePointIndex;
-						closePointIndex = invertAngledMeshVertices.Count - 1;
-						
-						colliderClosePointCount++;
+
 						if (previousCollider != hitCollider && null != previousCollider) {
 							colliderClosePointCount = 1;
-							
+//							
 							if (_startAngle == 0 && _endAngle == 360) {
-								AddNewTriangle(ref invertAngledTriangles, previousFarPointIndex, previousClosePointIndex, lastFarPointIndex);
-								AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, lastFarPointIndex);
-								AddNewTrianglesBetweenPoints2Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex);
+								invertAngledMeshVertices.Add(previousCloseTempPoint - position);
+								previousClosePointIndex = closePointIndex;
+								closePointIndex = invertAngledMeshVertices.Count - 1;
+
+								AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+								AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, firstFarPointIndex);
+								AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, firstFarPointIndex, previousClosePointIndex);
 							}
+						}
+						else {
+							invertAngledMeshVertices.Add(hitPoint - position);
+							previousClosePointIndex = closePointIndex;
+							closePointIndex = invertAngledMeshVertices.Count - 1;
+							
+							colliderClosePointCount++;
 						}
 					}
 					else {
@@ -715,8 +721,14 @@ namespace LOS {
 							AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, firstFarPointIndex, closePointIndex);
 						}
 						else {
-							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
-							AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, lastFarPointIndex);
+//							Debug.Log("Here3!!");	// NOTE: Fixed at last far point
+//							invertAngledMeshVertices.Add(previousCloseTempPoint - position);
+//							previousClosePointIndex = closePointIndex;
+//							closePointIndex = invertAngledMeshVertices.Count - 1;
+//
+//
+//							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
+//							AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, previousFarPointIndex);
 						}
 					}
 				}
