@@ -6,13 +6,14 @@ namespace LOS {
 
 	public class LOSLight : LOSObjectBase {
 
-		public Material defaultMaterial;
+		public float lightAngle = 0;
+		public float faceAngle = 0;
 		public float degreeStep = 0.1f;
 		public bool invert = true;
 		public LayerMask obstacleLayer;
-		public float lightAngle = 0;
-		public float faceAngle = 0;
-		public Color color = new Color(1, 1, 1, 1);
+		public Color color = new Color(1, 1, 1, 1); 
+		public Material defaultMaterial;
+		public float beamLength = 1;
 
 		private MeshFilter _meshFilter;
 		private float _previousFaceAngle;
@@ -162,6 +163,7 @@ namespace LOS {
 			List<Vector3> meshVertices = new List<Vector3>();
 			List<int> triangles = new List<int>();
 
+			bool raycastHitAtStartAngle = false;
 			Vector3 direction = Vector3.zero;
 			Vector3 previousNormal = Vector3.zero;
 			Collider previousCollider = null;
@@ -187,9 +189,11 @@ namespace LOS {
 					Vector3 hitNormal = hit.normal;
 
 					if (degree == _startAngle) {
+						raycastHitAtStartAngle = true;
 						meshVertices.Add(hitPoint - position);
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
+
 					}
 					else if (previousCollider != hit.collider) {
 						if (previousCollider == null) {
@@ -266,7 +270,19 @@ namespace LOS {
 
 			if (lightAngle == 0) {
 				if (previousCollider == null) {
-					AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, currentVertexIndex, 5, 0);
+					if (raycastHitAtStartAngle) {
+						Vector3 farPoint = Vector3.zero;
+						LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
+						
+						meshVertices.Add(farPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+
+						AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, previousVectexIndex, currentVertexIndex, 0);
+					}
+					else {
+						AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, currentVertexIndex, 5, 0);
+					}
 				}
 				else {
 					AddNewTriangle(ref triangles, 0, 5, currentVertexIndex);
@@ -833,7 +849,9 @@ namespace LOS {
 			foreach (Vector3 vertex in vertices) {
 				float u = vertex.x / LOSManager.instance.halfViewboxSize.x / 2 + 0.5f;
 				float v = vertex.y / LOSManager.instance.halfViewboxSize.x / 2 + 0.5f;
-				uvs.Add(new Vector2(u, v));
+				u = SMath.Clamp(0, u, 1);
+				v = SMath.Clamp(0, v, 1);
+				uvs.Add((new Vector2(u, v)));
 			}
 			return uvs;
 		}
