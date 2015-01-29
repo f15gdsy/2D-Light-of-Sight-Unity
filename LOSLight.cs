@@ -252,9 +252,20 @@ namespace LOS {
 							if (hitCollider != previousCollider && previousCollider != null) {
 								colliderClosePointCount = 1;
 
-								AddNewTriangle(ref invertAngledTriangles, previousFarPointIndex, previousClosePointIndex, farPointIndex);
 								AddNewTriangle(ref invertAngledTriangles, previousClosePointIndex, closePointIndex, farPointIndex);
-								AddNewTrianglesBetweenPoints2Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, farPointIndex);
+
+								Vector3 previousClosePoint = invertAngledMeshVertices[previousClosePointIndex] + position;
+								Vector3 previousFarPoint = invertAngledMeshVertices[previousFarPointIndex] + position;
+								Vector3 previousClosePointToFar = farPoint - previousClosePoint;
+								Vector3 previousCloseToPreviousFar = previousFarPoint - previousClosePoint;
+
+								if (SMath.GetDegreeBetweenIndexVector(previousCloseToPreviousFar.normalized, previousClosePointToFar.normalized) < 0) {	// left
+									AddNewTriangle(ref invertAngledTriangles, previousFarPointIndex, previousClosePointIndex, farPointIndex);
+									AddNewTrianglesBetweenPoints2Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, farPointIndex);
+								}
+								else {	// right
+									AddNewTrianglesBetweenPoints2Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, previousClosePointIndex);
+								}
 							}
 						}
 //						else if (hitCollider != previousCollider) {
