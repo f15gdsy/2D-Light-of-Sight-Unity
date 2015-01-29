@@ -5,9 +5,11 @@ using System.Collections.Generic;
 namespace LOS {
 
 	public class LOSManager : MonoBehaviour {
-
-		public Vector2 viewboxSize;
 		public Camera lightCamera;
+		public float viewboxExtension = 1.01f;
+
+		[HideInInspector]
+		public Vector2 halfViewboxSize;
 
 		public static float _tolerance = 0.1f;
 
@@ -67,12 +69,8 @@ namespace LOS {
 			_lightCameraTrans = lightCamera.transform;
 			
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
-			LOSManager.instance.viewboxSize = screenSize;
+			halfViewboxSize = screenSize / 2 * viewboxExtension;
 			UpdateViewingBox();
-		}
-
-		void Start () {
-
 		}
 
 		void LateUpdate () {
@@ -89,15 +87,18 @@ namespace LOS {
 		}
 
 		public void UpdateViewingBox () {
-			Vector2 upperRight = new Vector2(viewboxSize.x, viewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
-			Vector2 upperLeft = new Vector2(-viewboxSize.x, viewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
-			Vector2 lowerLeft = new Vector2(-viewboxSize.x, -viewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
-			Vector2 lowerRight = new Vector2(viewboxSize.x, -viewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
+			Vector2 upperRight = new Vector2(halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
+			Vector2 upperLeft = new Vector2(-halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
+			Vector2 lowerLeft = new Vector2(-halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
+			Vector2 lowerRight = new Vector2(halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
 
 			_viewbox[0].SetStartEnd(lowerRight, upperRight);		// right
 			_viewbox[1].SetStartEnd(upperRight, upperLeft);		// up
 			_viewbox[2].SetStartEnd(upperLeft, lowerLeft);	// left
 			_viewbox[3].SetStartEnd(lowerLeft, lowerRight);	// down
+
+			Debug.Log("camera pos : " + _lightCameraTrans.position);
+			Debug.Log("right start : " + _viewbox[0].start);
 		}
 
 		public void UpdateObstaclesTransformData () {
@@ -130,7 +131,7 @@ namespace LOS {
 					float u = crossQP_R / crossRS;
 
 					if (0 <= u && u <= 1 && 0 <= t) {
-						point = SMath.Vec2ToVec3(q + u * s);
+						point = q + u * s;
 						return true;
 					}
 				}
@@ -202,9 +203,9 @@ namespace LOS {
 			return false;
 		}
 
-		public bool CheckPointWithinViewingBox (Vector2 point, Vector2 center) {
-			return !(point.x <= -viewboxSize.x + center.x || point.x >= viewboxSize.x + center.x ||
-			        point.y <= -viewboxSize.y + center.y || point.y >= viewboxSize.y + center.y);
+		public bool CheckPointWithinViewingBox (Vector2 point) {
+			return !(point.x <= -halfViewboxSize.x + _lightCameraTrans.position.x || point.x >= halfViewboxSize.x + _lightCameraTrans.position.x ||
+			         point.y <= -halfViewboxSize.y + _lightCameraTrans.position.y || point.y >= halfViewboxSize.y + _lightCameraTrans.position.y);
 		}
 
 		private float ClampDegree (float start, float degree) {
