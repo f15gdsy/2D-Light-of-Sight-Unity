@@ -16,8 +16,6 @@ public class LOSObjectBase : MonoBehaviour {
 
 	protected virtual void Awake () {
 		_trans = transform;
-
-		UpdatePreviousInfo();
 	}
 
 	public virtual bool CheckDirty () {

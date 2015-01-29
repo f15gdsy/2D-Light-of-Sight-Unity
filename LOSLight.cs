@@ -43,14 +43,19 @@ namespace LOS {
 
 			DoDraw();
 		}
-		
-		void Update () {
-			if (SHelper.CheckWithinScreen(position, LOSManager.instance.lightCamera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
-				UpdatePreviousInfo();
-				_previousAngle = faceAngle;
 
+		private float time;
+
+		void LateUpdate () {
+			if (SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.camera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
+				UpdatePreviousInfo();
 				DoDraw();
 			}
+		}
+
+		public override void UpdatePreviousInfo () {
+			base.UpdatePreviousInfo ();
+			_previousAngle = faceAngle;
 		}
 
 		public override bool CheckDirty () {
@@ -65,7 +70,7 @@ namespace LOS {
 				DrawInvertAngled();
 			}
 			else {
-				Draw();
+				DrawImp();
 			}
 		}
 
@@ -73,21 +78,18 @@ namespace LOS {
 			List<Vector3> meshVertices = new List<Vector3>();
 			List<int> triangles = new List<int>();
 
-			bool raycastHitPreviously = false;
-
 			float distance = GetMinRaycastDistance();
 			RaycastHit hit;
-
 			int previousVectexIndex = 0;
 			Vector3 hitPoint = Vector3.zero;
 
 			meshVertices.Add(Vector3.zero);
 		
 			Vector2 viewboxSize = LOSManager.instance.halfViewboxSize;
-			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
-			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
-			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
-			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + LOSManager.instance.lightCameraTrans.position;
+			Vector3 upperRight = new Vector3(viewboxSize.x, viewboxSize.y) + LOSManager.instance.losCameraTrans.position;
+			Vector3 upperLeft = new Vector3(-viewboxSize.x, viewboxSize.y) + LOSManager.instance.losCameraTrans.position;
+			Vector3 lowerLeft = new Vector3(-viewboxSize.x, -viewboxSize.y) + LOSManager.instance.losCameraTrans.position;
+			Vector3 lowerRight = new Vector3(viewboxSize.x, -viewboxSize.y) + LOSManager.instance.losCameraTrans.position;
 
 			upperRight.z = 0;
 			upperLeft.z = 0;
@@ -120,17 +122,9 @@ namespace LOS {
 
 				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer)) {
 					hitPoint = hit.point;
-
-					if (!raycastHitPreviously) {
-
-					}
 				}
 				else {
 					LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref hitPoint);
-
-					if (raycastHitPreviously) {
-
-					}
 				}
 
 				meshVertices.Add(hitPoint - position);
@@ -154,6 +148,163 @@ namespace LOS {
 			_meshFilter.mesh = mesh;
 		}
 
+		private void DrawImp () {
+			List<Vector3> meshVertices = new List<Vector3>();
+			List<int> triangles = new List<int>();
+
+			Vector3 direction = Vector3.zero;
+			Vector3 previousNormal = Vector3.zero;
+			Collider previousCollider = null;
+			float distance = GetMinRaycastDistance();
+			RaycastHit hit;
+			int currentVertexIndex = -1;
+			int previousVectexIndex = -1;
+			Vector3 previousTempPoint = Vector3.zero;
+
+			meshVertices.Add(Vector3.zero);
+
+			// Add the four viewbox corners.
+			foreach (Vector3 corner in LOSManager.instance.viewboxCorners) {
+				meshVertices.Add(corner - position);
+			}
+			
+			for (float degree=_startAngle; degree<_endAngle; degree+=degreeStep) {
+				direction = SMath.DegreeToUnitVector(degree);
+				
+				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit)) {
+					Vector3 hitPoint = hit.point;
+					Collider hitCollider = hit.collider;
+					Vector3 hitNormal = hit.normal;
+
+					if (degree == _startAngle) {
+						meshVertices.Add(hitPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+					}
+//					else if (degree + degreeStep >= _endAngle && lightAngle != 0) {
+//						meshVertices.Add(hitPoint - position);
+//						previousVectexIndex = currentVertexIndex;
+//						currentVertexIndex = meshVertices.Count - 1;
+//					}
+					else if (previousCollider != hit.collider) {
+						if (previousCollider == null) {
+							Vector3 farPoint = Vector3.zero;
+							LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
+
+							meshVertices.Add(farPoint - position);
+							previousVectexIndex = currentVertexIndex;
+							currentVertexIndex = meshVertices.Count - 1;
+
+							AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, previousVectexIndex, currentVertexIndex, 0);
+//							AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
+
+							meshVertices.Add(hitPoint - position);
+							previousVectexIndex = currentVertexIndex;
+							currentVertexIndex = meshVertices.Count - 1;
+						}
+						else {
+							meshVertices.Add(previousTempPoint - position);
+							previousVectexIndex = currentVertexIndex;
+							currentVertexIndex = meshVertices.Count - 1;
+							AddNewTriangle (ref triangles, 0, currentVertexIndex, previousVectexIndex);
+
+							meshVertices.Add(hitPoint - position);
+							previousVectexIndex = currentVertexIndex;
+							currentVertexIndex = meshVertices.Count - 1;
+							AddNewTriangle (ref triangles, 0, currentVertexIndex, previousVectexIndex);
+						}
+					}
+					else if (previousNormal != hitNormal) {
+						meshVertices.Add(previousTempPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+						AddNewTriangle (ref triangles, 0, currentVertexIndex, previousVectexIndex);
+						
+						meshVertices.Add(hitPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+						AddNewTriangle (ref triangles, 0, currentVertexIndex, previousVectexIndex);
+					}
+
+					previousCollider = hitCollider;
+					previousTempPoint = hitPoint;
+					previousNormal = hitNormal;
+				}
+				else {
+					if (degree == _startAngle) {
+						Vector3 farPoint = Vector3.zero;
+						LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
+
+						meshVertices.Add(farPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+					}
+//					else if (degree + degreeStep >= _endAngle && lightAngle != 0) {
+//						Vector3 farPoint = Vector3.zero;
+//						LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
+//
+//						meshVertices.Add(farPoint - position);
+//						previousVectexIndex = currentVertexIndex;
+//						currentVertexIndex = meshVertices.Count - 1;
+//					}
+					else if (previousCollider != null) {
+						meshVertices.Add(previousTempPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+						AddNewTriangle (ref triangles, 0, currentVertexIndex, previousVectexIndex);
+
+						Vector3 farPoint = Vector3.zero;
+						LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
+
+						meshVertices.Add(farPoint - position);
+						previousVectexIndex = currentVertexIndex;
+						currentVertexIndex = meshVertices.Count - 1;
+						AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
+
+
+					}
+					previousCollider = null;
+//					previousTempPoint = farPoint;
+				}
+			}
+
+			if (lightAngle == 0) {
+				if (previousCollider == null) {
+					AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, currentVertexIndex, 5, 0);
+				}
+				else {
+					AddNewTriangle(ref triangles, 0, 5, currentVertexIndex);
+				}
+			}
+			else {
+				if (previousCollider == null) {
+					Vector3 farPoint = Vector3.zero;
+					LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
+
+					meshVertices.Add(farPoint - position);
+					previousVectexIndex = currentVertexIndex;
+					currentVertexIndex = meshVertices.Count - 1;
+//					AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
+					
+					AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, previousVectexIndex, currentVertexIndex, 0);
+				}
+				else {
+					meshVertices.Add(previousTempPoint - position);
+					previousVectexIndex = currentVertexIndex;
+					currentVertexIndex = meshVertices.Count - 1;
+//					AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
+					AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
+				}
+			}
+
+			Mesh mesh = new Mesh();
+			
+			mesh.vertices = meshVertices.ToArray();
+			mesh.triangles = triangles.ToArray();
+			
+			_meshFilter.mesh = mesh;
+		}
+
 		private void DrawInvertAngled () {
 			List<Vector3> invertAngledMeshVertices = new List<Vector3>();
 			List<int> invertAngledTriangles = new List<int>();
@@ -163,7 +314,6 @@ namespace LOS {
 			Vector3 lastFarPoint = Vector3.zero;
 			int firstFarPointIndex = -1;
 			int lastFarPointIndex = -1;
-			int lastClosePointIndex = -1;
 			int farPointIndex = -1;
 			int previousFarPointIndex = -1;
 			int closePointIndex = -1;

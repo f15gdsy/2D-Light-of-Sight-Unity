@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace LOS {
 
 	public class LOSManager : MonoBehaviour {
-		public Camera lightCamera;
+		public LOSCamera losCamera;
 		public float viewboxExtension = 1.01f;
 
 		[HideInInspector]
@@ -15,10 +15,11 @@ namespace LOS {
 
 		private static LOSManager _instance;
 		private static bool _sceneEnd;
+		private static bool _awaken;
 
 		private List<LOSObstacle> _obstacles;
 		private List<LOSObstacleLine> _viewbox;
-		private Transform _lightCameraTrans;
+		private Transform _losCameraTrans;
 
 
 		public static LOSManager instance {
@@ -27,10 +28,17 @@ namespace LOS {
 					return null;
 				}
 
-				if (_instance == null && ((_instance = FindObjectOfType<LOSManager>()) == null)) {
-					var go = new GameObject();
-					go.name = "LOSManager";
-					_instance = go.AddComponent<LOSManager>();
+				if (_instance == null) {
+					_instance = FindObjectOfType<LOSManager>();
+
+					if (_instance == null) {
+						var go = new GameObject();
+						go.name = "LOSManager";
+						_instance = go.AddComponent<LOSManager>();
+					}
+					else {
+						_instance.Awake();
+					}
 				}
 				return _instance;
 			}
@@ -48,11 +56,13 @@ namespace LOS {
 			}
 		}
 
-		public Transform lightCameraTrans {get {return _lightCameraTrans;}}
+		public Transform losCameraTrans {get {return _losCameraTrans;}}
 
 
 		void Awake () {
 			_instance = this;
+
+			if (_awaken) return;
 
 			_obstacles = new List<LOSObstacle>();
 			
@@ -63,18 +73,29 @@ namespace LOS {
 				_viewbox.Add(line);
 			}
 
-			if (lightCamera == null) {
-				lightCamera = Camera.main;
+			if (losCamera == null) {
+				LOSCamera[] losCameras = GameObject.FindObjectsOfType<LOSCamera>();
+				if (losCameras.Length == 0) {
+					Debug.LogError("No LOSCamera found!");
+				}
+				else if (losCameras.Length > 1) {
+					Debug.LogError("More than 1 LOSCamera found!");
+				}
+				else {
+					losCamera = losCameras[0];
+				}
 			}
-			_lightCameraTrans = lightCamera.transform;
+			_losCameraTrans = losCamera.transform;
 			
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
 			halfViewboxSize = screenSize / 2 * viewboxExtension;
 			UpdateViewingBox();
+
+			_awaken = true;
 		}
 
 		void LateUpdate () {
-			UpdateObstaclesTransformData();
+			UpdatePreviousInfo();
 			UpdateViewingBox();
 		}
 
@@ -87,21 +108,20 @@ namespace LOS {
 		}
 
 		public void UpdateViewingBox () {
-			Vector2 upperRight = new Vector2(halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
-			Vector2 upperLeft = new Vector2(-halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
-			Vector2 lowerLeft = new Vector2(-halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
-			Vector2 lowerRight = new Vector2(halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(_lightCameraTrans.position);
+			Vector2 upperRight = new Vector2(halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(_losCameraTrans.position);
+			Vector2 upperLeft = new Vector2(-halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(_losCameraTrans.position);
+			Vector2 lowerLeft = new Vector2(-halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(_losCameraTrans.position);
+			Vector2 lowerRight = new Vector2(halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(_losCameraTrans.position);
 
 			_viewbox[0].SetStartEnd(lowerRight, upperRight);		// right
 			_viewbox[1].SetStartEnd(upperRight, upperLeft);		// up
 			_viewbox[2].SetStartEnd(upperLeft, lowerLeft);	// left
 			_viewbox[3].SetStartEnd(lowerLeft, lowerRight);	// down
-
-			Debug.Log("camera pos : " + _lightCameraTrans.position);
-			Debug.Log("right start : " + _viewbox[0].start);
 		}
 
-		public void UpdateObstaclesTransformData () {
+		public void UpdatePreviousInfo () {
+			losCamera.UpdatePreviousInfo();
+
 			foreach (LOSObstacle obstacle in _obstacles) {
 				obstacle.UpdatePreviousInfo();
 			}
@@ -195,6 +215,8 @@ namespace LOS {
 		}
 
 		public bool CheckDirty () {
+			if (losCamera.CheckDirty()) return true;
+
 			foreach (LOSObstacle obstacle in _obstacles) {
 				if (!obstacle.isStatic && obstacle.CheckDirty()) {
 					return true;
@@ -204,8 +226,8 @@ namespace LOS {
 		}
 
 		public bool CheckPointWithinViewingBox (Vector2 point) {
-			return !(point.x <= -halfViewboxSize.x + _lightCameraTrans.position.x || point.x >= halfViewboxSize.x + _lightCameraTrans.position.x ||
-			         point.y <= -halfViewboxSize.y + _lightCameraTrans.position.y || point.y >= halfViewboxSize.y + _lightCameraTrans.position.y);
+			return !(point.x <= -halfViewboxSize.x + _losCameraTrans.position.x || point.x >= halfViewboxSize.x + _losCameraTrans.position.x ||
+			         point.y <= -halfViewboxSize.y + _losCameraTrans.position.y || point.y >= halfViewboxSize.y + _losCameraTrans.position.y);
 		}
 
 		private float ClampDegree (float start, float degree) {
