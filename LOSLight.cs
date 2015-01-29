@@ -12,10 +12,12 @@ namespace LOS {
 		public LayerMask obstacleLayer;
 		public float lightAngle = 0;
 		public float faceAngle = 0;
+		public Color color = new Color(1, 1, 1, 1);
 
 		private MeshFilter _meshFilter;
 		private float _previousFaceAngle;
 		private float _previousLightAngle;
+		private Color _previousColor;
 		private float _raycastDistance;
 		private float _startAngle;
 		private float _endAngle;
@@ -35,9 +37,11 @@ namespace LOS {
 			}
 
 			if (renderer == null) {
-				gameObject.AddComponent<MeshRenderer>();
-				renderer.material = defaultMaterial;
+//				gameObject.AddComponent<MeshRenderer>();
+//				renderer.material = defaultMaterial;
 			}
+
+			renderer.material = defaultMaterial;
 
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
 			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
@@ -58,10 +62,14 @@ namespace LOS {
 			base.UpdatePreviousInfo ();
 			_previousFaceAngle = faceAngle;
 			_previousLightAngle = lightAngle;
+			_previousColor = color;
 		}
 
 		public override bool CheckDirty () {
-			return !_previousPosition.Equals(position) || !_previousFaceAngle.Equals(faceAngle) || !_previousLightAngle.Equals(lightAngle);
+			return !_previousPosition.Equals(position) || 
+				!_previousFaceAngle.Equals(faceAngle) || 
+					!_previousLightAngle.Equals(lightAngle) ||
+					!_previousColor.Equals(color);
 		}
 
 		private void DoDraw () {
@@ -183,11 +191,6 @@ namespace LOS {
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
 					}
-//					else if (degree + degreeStep >= _endAngle && lightAngle != 0) {
-//						meshVertices.Add(hitPoint - position);
-//						previousVectexIndex = currentVertexIndex;
-//						currentVertexIndex = meshVertices.Count - 1;
-//					}
 					else if (previousCollider != hit.collider) {
 						if (previousCollider == null) {
 							Vector3 farPoint = Vector3.zero;
@@ -198,7 +201,6 @@ namespace LOS {
 							currentVertexIndex = meshVertices.Count - 1;
 
 							AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, previousVectexIndex, currentVertexIndex, 0);
-//							AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
 
 							meshVertices.Add(hitPoint - position);
 							previousVectexIndex = currentVertexIndex;
@@ -241,14 +243,6 @@ namespace LOS {
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
 					}
-//					else if (degree + degreeStep >= _endAngle && lightAngle != 0) {
-//						Vector3 farPoint = Vector3.zero;
-//						LOSManager.instance.GetCollisionPointWithViewBox(position, direction, ref farPoint);
-//
-//						meshVertices.Add(farPoint - position);
-//						previousVectexIndex = currentVertexIndex;
-//						currentVertexIndex = meshVertices.Count - 1;
-//					}
 					else if (previousCollider != null) {
 						meshVertices.Add(previousTempPoint - position);
 						previousVectexIndex = currentVertexIndex;
@@ -286,25 +280,18 @@ namespace LOS {
 					meshVertices.Add(farPoint - position);
 					previousVectexIndex = currentVertexIndex;
 					currentVertexIndex = meshVertices.Count - 1;
-//					AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
-					
+
 					AddNewTrianglesBetweenPoints4Corners(ref triangles, meshVertices, previousVectexIndex, currentVertexIndex, 0);
 				}
 				else {
 					meshVertices.Add(previousTempPoint - position);
 					previousVectexIndex = currentVertexIndex;
 					currentVertexIndex = meshVertices.Count - 1;
-//					AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
 					AddNewTriangle(ref triangles, 0, currentVertexIndex, previousVectexIndex);
 				}
 			}
 
-			Mesh mesh = new Mesh();
-			
-			mesh.vertices = meshVertices.ToArray();
-			mesh.triangles = triangles.ToArray();
-			
-			_meshFilter.mesh = mesh;
+			DeployMesh(meshVertices, triangles, CalculateUVs(meshVertices), color);
 		}
 
 		private void DrawInvertAngled () {
@@ -510,12 +497,7 @@ namespace LOS {
 				}
 			}
 
-			Mesh mesh = new Mesh();
-			
-			mesh.vertices = invertAngledMeshVertices.ToArray();
-			mesh.triangles = invertAngledTriangles.ToArray();
-			
-			_meshFilter.mesh = mesh;
+			DeployMesh(invertAngledMeshVertices, invertAngledTriangles, CalculateUVs(invertAngledMeshVertices), color);
 		}
 
 		private void AddNewTrianglesBetweenPoints2Corners (ref List<int> triangles, List<Vector3> vertices, int pointAIndex, int pointBIndex) {
@@ -620,6 +602,33 @@ namespace LOS {
 		private bool CheckRaycastHit (RaycastHit hit) {
 			Vector3 hitPoint = hit.point;
 			return LOSManager.instance.CheckPointWithinViewingBox(hitPoint);
+		}
+
+		private List<Vector2> CalculateUVs (List<Vector3> vertices) {
+			List<Vector2> uvs = new List<Vector2>();
+
+			foreach (Vector3 vertex in vertices) {
+				float u = vertex.x / LOSManager.instance.halfViewboxSize.x / 2 + 0.5f;
+				float v = vertex.y / LOSManager.instance.halfViewboxSize.x / 2 + 0.5f;
+				uvs.Add(new Vector2(u, v));
+			}
+			return uvs;
+		}
+
+		private void DeployMesh (List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, Color color) {
+			Mesh mesh = new Mesh();
+			
+			mesh.vertices = vertices.ToArray();
+			mesh.triangles = triangles.ToArray();
+			mesh.uv = uvs.ToArray();
+
+			Color32[] colors32 = new Color32[vertices.Count];
+			for (int i=0; i<colors32.Length; i++) {
+				colors32[i] = color;
+			}
+			mesh.colors32 = colors32;
+			
+			_meshFilter.mesh = mesh;
 		}
 	}
 }
