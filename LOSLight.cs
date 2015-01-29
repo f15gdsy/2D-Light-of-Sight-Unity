@@ -14,7 +14,8 @@ namespace LOS {
 		public float faceAngle = 0;
 
 		private MeshFilter _meshFilter;
-		private float _previousAngle;
+		private float _previousFaceAngle;
+		private float _previousLightAngle;
 		private float _raycastDistance;
 		private float _startAngle;
 		private float _endAngle;
@@ -55,11 +56,12 @@ namespace LOS {
 
 		public override void UpdatePreviousInfo () {
 			base.UpdatePreviousInfo ();
-			_previousAngle = faceAngle;
+			_previousFaceAngle = faceAngle;
+			_previousLightAngle = lightAngle;
 		}
 
 		public override bool CheckDirty () {
-			return !_previousPosition.Equals(position) || !_previousAngle.Equals(faceAngle);
+			return !_previousPosition.Equals(position) || !_previousFaceAngle.Equals(faceAngle) || !_previousLightAngle.Equals(lightAngle);
 		}
 
 		private void DoDraw () {
