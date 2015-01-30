@@ -109,7 +109,7 @@ namespace LOS {
 				}
 			}
 			
-			if (lightAngle == 0) {
+			if (coneAngle == 0) {
 				if (previousCollider == null) {
 					if (raycastHitAtStartAngle) {
 						Vector3 farPoint = LOSManager.instance.GetPointForRadius(position, direction, radius);

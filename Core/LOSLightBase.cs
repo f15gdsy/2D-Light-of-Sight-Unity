@@ -6,10 +6,19 @@ namespace LOS {
 
 	public class LOSLightBase : LOSObjectBase {
 
-		public float lightAngle = 0;
+		[Tooltip("The angle of the light cone. 0 means every direction.")]
+		public float coneAngle = 0;
+
+		[Tooltip("The direction that the light is facing. Measured in degrees, counting from direction (1, 0)")]
 		public float faceAngle = 0;
+
+		[Tooltip("The precision of the light collision test. Measured in degrees.")]
 		public float degreeStep = 0.1f;
-		public bool invert = true;
+
+		[Tooltip("Draws the light in invert mode or not.")]
+		public bool invertMode = false;
+
+		[Tooltip("The layers that the light will interact with.")]
 		public LayerMask obstacleLayer;
 		public Color color = new Color(1, 1, 1, 1); 
 		public Material defaultMaterial;
@@ -27,7 +36,7 @@ namespace LOS {
 		protected override void Awake () {
 			base.Awake();
 
-			lightAngle = SMath.ClampDegree0To360(lightAngle);
+			coneAngle = SMath.ClampDegree0To360(coneAngle);
 		}
 
 		void Start () {
@@ -59,22 +68,22 @@ namespace LOS {
 		public override void UpdatePreviousInfo () {
 			base.UpdatePreviousInfo ();
 			_previousFaceAngle = faceAngle;
-			_previousLightAngle = lightAngle;
+			_previousLightAngle = coneAngle;
 			_previousColor = color;
 		}
 
 		public override bool CheckDirty () {
 			return !_previousPosition.Equals(position) || 
 				!_previousFaceAngle.Equals(faceAngle) || 
-					!_previousLightAngle.Equals(lightAngle) ||
+					!_previousLightAngle.Equals(coneAngle) ||
 					!_previousColor.Equals(color);
 		}
 
 		private void DoDraw () {
-			_startAngle = lightAngle == 0 ? 0 : faceAngle - lightAngle / 2;
-			_endAngle = lightAngle == 0 ? 360 : faceAngle + lightAngle / 2;
+			_startAngle = coneAngle == 0 ? 0 : faceAngle - coneAngle / 2;
+			_endAngle = coneAngle == 0 ? 360 : faceAngle + coneAngle / 2;
 
-			if (invert) {
+			if (invertMode) {
 				InvertDraw();
 			}
 			else {

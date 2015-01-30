@@ -115,7 +115,7 @@ namespace LOS {
 				}
 			}
 			
-			if (lightAngle == 0) {
+			if (coneAngle == 0) {
 				if (previousCollider == null) {
 					if (raycastHitAtStartAngle) {
 						Vector3 farPoint = Vector3.zero;
@@ -372,14 +372,7 @@ namespace LOS {
 							AddNewTrianglesBetweenPoints4Corners(ref invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, firstFarPointIndex, closePointIndex);
 						}
 						else {
-							//							Debug.Log("Here3!!");	// NOTE: Fixed at last far point
-							//							invertAngledMeshVertices.Add(previousCloseTempPoint - position);
-							//							previousClosePointIndex = closePointIndex;
-							//							closePointIndex = invertAngledMeshVertices.Count - 1;
-							//
-							//
-							//							AddNewTriangle(ref invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
-							//							AddNewTriangle(ref invertAngledTriangles, closePointIndex, firstFarPointIndex, previousFarPointIndex);
+							// NOTE: Fixed at last far point
 						}
 					}
 				}
