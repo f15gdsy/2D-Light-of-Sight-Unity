@@ -13,15 +13,14 @@ namespace LOS {
 		public LayerMask obstacleLayer;
 		public Color color = new Color(1, 1, 1, 1); 
 		public Material defaultMaterial;
-		public float beamLength = 1;
 
-		private MeshFilter _meshFilter;
-		private float _previousFaceAngle;
-		private float _previousLightAngle;
-		private Color _previousColor;
-		private float _raycastDistance;
-		private float _startAngle;
-		private float _endAngle;
+		protected MeshFilter _meshFilter;
+		protected float _previousFaceAngle;
+		protected float _previousLightAngle;
+		protected Color _previousColor;
+		protected float _raycastDistance;
+		protected float _startAngle;
+		protected float _endAngle;
 
 
 
@@ -49,8 +48,6 @@ namespace LOS {
 
 			DoDraw();
 		}
-
-		private float time;
 
 		void LateUpdate () {
 			if (SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.camera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {

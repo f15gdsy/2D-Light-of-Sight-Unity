@@ -127,6 +127,14 @@ namespace LOS {
 			}
 		}
 
+		public Vector3 GetPointForRadius (Vector3 origin, Vector3 direction, float radius) {
+			float c = direction.magnitude;
+
+			float x = radius * direction.x / c + origin.x;
+			float y = radius * direction.y / c + origin.y;
+			return new Vector3(x, y, 0);
+		}
+
 		public bool GetCollisionPointWithViewBox (Vector3 origin, Vector3 direction, ref Vector3 point) {
 			foreach (LOSObstacleLine line in _viewbox) {
 				Vector2 q = line.start;
