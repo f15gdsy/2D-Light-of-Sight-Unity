@@ -40,6 +40,8 @@ namespace LOS.Editor {
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(_color);
 			EditorGUILayout.PropertyField(_defaultMaterial);
+
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 

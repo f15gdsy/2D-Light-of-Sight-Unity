@@ -15,7 +15,7 @@ namespace LOS {
 
 		private static LOSManager _instance;
 		private static bool _sceneEnd;
-		private static bool _awaken;
+		private static bool _awake;
 
 		private List<LOSObstacle> _obstacles;
 		private List<LOSObstacleLine> _viewbox;
@@ -62,11 +62,12 @@ namespace LOS {
 		void Awake () {
 			_instance = this;
 
-			if (_awaken) return;
+			if (_awake) return;
 
 			_obstacles = new List<LOSObstacle>();
 			
 			_viewbox = new List<LOSObstacleLine>();
+
 			for (int i=0; i<4; i++) {
 				GameObject lineGo = new GameObject();
 				LOSObstacleLine line = lineGo.AddComponent<LOSObstacleLine>();
@@ -91,7 +92,7 @@ namespace LOS {
 			halfViewboxSize = screenSize / 2 * viewboxExtension;
 			UpdateViewingBox();
 
-			_awaken = true;
+			_awake = true;
 		}
 
 		void LateUpdate () {
@@ -135,7 +136,8 @@ namespace LOS {
 			return new Vector3(x, y, 0);
 		}
 
-		public bool GetCollisionPointWithViewBox (Vector3 origin, Vector3 direction, ref Vector3 point) {
+		public Vector3 GetCollisionPointWithViewBox (Vector3 origin, Vector3 direction) {
+			Vector3 point = Vector3.zero;
 			foreach (LOSObstacleLine line in _viewbox) {
 				Vector2 q = line.start;
 				Vector2 s = line.end - line.start;
@@ -160,11 +162,11 @@ namespace LOS {
 
 					if (0 <= u && u <= 1 && 0 <= t) {
 						point = q + u * s;
-						return true;
+						break;
 					}
 				}
 			}
-			return false;
+			return point;
 		}
 
 		// Works in counter-clock wise, pointA is the one with smaller angle against vector (1, 0)
@@ -223,9 +225,7 @@ namespace LOS {
 		}
 
 		public bool CheckDirty () {
-			if (losCamera.CheckDirty()) return true;
-
-			foreach (LOSObstacle obstacle in _obstacles) {
+				foreach (LOSObstacle obstacle in _obstacles) {
 				if (!obstacle.isStatic && obstacle.CheckDirty()) {
 					return true;
 				}

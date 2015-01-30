@@ -19,6 +19,8 @@ namespace LOS.Editor {
 			base.OnInspectorGUI();
 
 			EditorGUILayout.PropertyField(_invertMode);
+
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

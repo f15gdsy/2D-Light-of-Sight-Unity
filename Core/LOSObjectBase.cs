@@ -3,7 +3,7 @@ using System.Collections;
 
 public class LOSObjectBase : MonoBehaviour {
 
-	[Tooltip("Static light will not respond to any changes.")]
+	[Tooltip("Will not be considered in the LOS system.")]
 	public bool isStatic;
 
 	protected Transform _trans;

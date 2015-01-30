@@ -1,4 +1,4 @@
-﻿Shader "LOS/ForwardLight" {
+﻿Shader "LOS/RadialLight" {
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 	}
