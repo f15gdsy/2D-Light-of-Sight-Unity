@@ -285,6 +285,10 @@ namespace LOS {
 					}
 				}
 				else {
+					meshVertices.Add(previousTempPoint - position);
+					previousVectexIndex = currentVertexIndex;
+					currentVertexIndex = meshVertices.Count - 1;
+					AddNewTriangle (ref triangles, 0, currentVertexIndex, previousVectexIndex);
 					AddNewTriangle(ref triangles, 0, 5, currentVertexIndex);
 				}
 			}
