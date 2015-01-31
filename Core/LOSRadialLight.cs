@@ -163,7 +163,7 @@ namespace LOS {
 						meshVertices.Add(farPoint - position);
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
-						
+						AddNewTriangle(triangles, 0, 1, currentVertexIndex);
 					}
 					else {
 						AddNewTriangle(triangles, 0, 1, currentVertexIndex);

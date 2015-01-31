@@ -1,4 +1,4 @@
-﻿Shader "LOS/Basic" {
+﻿Shader "LOS/GreyscaleShadow" {
 	SubShader {
         Tags {
             "IgnoreProjector"="True"
@@ -6,7 +6,7 @@
             "RenderType"="Transparent"
         }
         Pass {        
-            Blend DstColor Zero
+            Blend DstAlpha Zero
             ZWrite Off
             Lighting Off
             Fog {Mode Off}
