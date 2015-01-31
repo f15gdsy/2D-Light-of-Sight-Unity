@@ -1,26 +1,19 @@
-﻿Shader "LOS/RadialLight" {
-	Properties {
-		_MainTex ("Base (RGB)", 2D) = "white" {}
-	}
+﻿Shader "LOS/Greyscale Foreground" {
 	SubShader {
         Tags {
             "IgnoreProjector"="True"
             "Queue"="Transparent+1"
             "RenderType"="Transparent"
         }
-        Pass {
-            Name "ForwardBase"
-            Tags {
-                "LightMode"="Always"
-            }
-            Blend SrcAlpha One
+        Pass {        
+            Blend DstAlpha Zero
             ZWrite Off
-            
+            Lighting Off
             Fog {Mode Off}
+            
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #include "UnityCG.cginc"
             #pragma target 3.0
 
             uniform sampler2D _MainTex; 
@@ -28,19 +21,16 @@
             
             struct vIn {
                 float4 vertex : POSITION;
-                float2 texcoord0 : TEXCOORD0;
                 float4 color : COLOR;
             };
             
             struct v2f {
                 float4 pos : SV_POSITION;
-                float2 uv0 : TEXCOORD0;
                 float4 color : COLOR;
             };
             
             v2f vert (vIn v) {
                 v2f o;
-                o.uv0 = v.texcoord0;
                 o.color = v.color;
                 o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
                 return o;
@@ -48,8 +38,7 @@
             
             fixed4 frag(v2f i) : COLOR {
             	_intensity = 1;
-                float4 _MainTex_var = tex2D(_MainTex, i.uv0);
-                return fixed4(i.color.rgb * _intensity, _MainTex_var.r * i.color.a);
+                return fixed4(i.color.rgb * _intensity, i.color.a);
             }
             ENDCG
         }
