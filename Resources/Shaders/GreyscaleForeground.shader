@@ -15,9 +15,6 @@
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.0
-
-            uniform sampler2D _MainTex; 
-         	uniform float _intensity;
             
             struct vIn {
                 float4 vertex : POSITION;
@@ -37,8 +34,7 @@
             }
             
             fixed4 frag(v2f i) : COLOR {
-            	_intensity = 1;
-                return fixed4(i.color.rgb * _intensity, i.color.a);
+                return fixed4(i.color.rgb, i.color.a);
             }
             ENDCG
         }

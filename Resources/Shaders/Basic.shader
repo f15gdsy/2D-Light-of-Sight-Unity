@@ -6,7 +6,7 @@
             "RenderType"="Transparent"
         }
         Pass {        
-            Blend DstColor Zero
+            Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
             Lighting Off
             Fog {Mode Off}
