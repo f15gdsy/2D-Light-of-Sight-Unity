@@ -7,6 +7,7 @@ namespace LOS {
 	public class LOSManager : MonoBehaviour {
 		public LOSCamera losCamera;
 		public float viewboxExtension = 1.01f;
+		public float collidersExtension = 1.001f;
 
 		[HideInInspector]
 		public Vector2 halfViewboxSize;

@@ -6,6 +6,8 @@ namespace LOS {
 
 	public class LOSFullScreenLight : LOSLightBase {
 
+		private float _tolerance;
+
 
 		public override bool CheckDirty () {
 			return base.CheckDirty () || LOSManager.instance.losCamera.CheckDirty();
@@ -174,6 +176,7 @@ namespace LOS {
 			Vector3 firstFarPoint = Vector3.zero;
 			Vector3 lastFarPoint = Vector3.zero;
 			Vector3 previousCloseTempPoint = Vector3.zero;
+			Vector3 previousDirection = Vector3.zero;
 			int firstFarPointIndex = -1;
 			int lastFarPointIndex = -1;
 			int farPointIndex = -1;
@@ -253,11 +256,13 @@ namespace LOS {
 					}
 					else {
 						if (null == previousCollider) {
-							Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+							Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, previousDirection);
 							invertAngledMeshVertices.Add(farPoint - position);
 							previousFarPointIndex = farPointIndex;
 							farPointIndex = invertAngledMeshVertices.Count - 1;
-							
+
+							hitPoint = GetToleratedHitPointColliderInOut(previousDirection, hit);
+		
 							invertAngledMeshVertices.Add(hitPoint - position);
 							previousClosePointIndex = closePointIndex;
 							closePointIndex = invertAngledMeshVertices.Count - 1;
@@ -303,7 +308,11 @@ namespace LOS {
 								previousClosePointIndex = closePointIndex;
 								closePointIndex = invertAngledMeshVertices.Count - 1;
 								AddNewTriangle(invertAngledTriangles, closePointIndex, farPointIndex, previousClosePointIndex);
-								
+
+//								if (SMath.GetDegreeBetweenIndexVector(previousNormal.normalized, hitNormal.normalized) > 0) {
+//									hitPoint = GetToleranceHitPointNormalChange(previousNormal, hitPoint, previousCloseTempPoint);
+//								}
+
 								invertAngledMeshVertices.Add(hitPoint - position);
 								previousClosePointIndex = closePointIndex;
 								closePointIndex = invertAngledMeshVertices.Count - 1;
@@ -357,6 +366,7 @@ namespace LOS {
 					
 					previousCollider = null;
 				}
+				previousDirection = direction;
 			}
 			
 			
@@ -394,6 +404,24 @@ namespace LOS {
 			}
 			
 			DeployMesh(invertAngledMeshVertices, invertAngledTriangles);
+		}
+
+
+		/// <summary>
+		/// This function is used to help the shadow tocover the colliders better
+		/// </summary>
+		/// <returns>The hitpoint after calculation. </returns>
+		/// <param name="targetDirection">Target direction.</param>
+		/// <param name="hit">Hit.</param>
+		private Vector3 GetToleratedHitPointColliderInOut (Vector3 targetDirection, RaycastHit hit) {
+			return _trans.position + hit.distance * targetDirection.normalized;
+		}
+
+
+		// Not used
+		private Vector3 GetToleranceHitPointNormalChange (Vector3 previousNormal, Vector3 hitpoint, Vector3 previousHitpoint) {
+			float delta = Mathf.Min(Mathf.Abs(previousHitpoint.x - hitpoint.x), Mathf.Abs(previousHitpoint.y - hitpoint.y));
+			return hitpoint + previousNormal.normalized * delta;
 		}
 	}
 
