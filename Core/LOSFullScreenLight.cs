@@ -186,7 +186,7 @@ namespace LOS {
 			int closePointAtDegree0Index = -1;
 			int colliderClosePointCount = 0;
 			RaycastHit hit;
-			
+			RaycastHit previousHit = new RaycastHit();
 			
 			invertAngledMeshVertices.Add(Vector3.zero);		// Add the position of the light
 			
@@ -276,17 +276,22 @@ namespace LOS {
 							invertAngledMeshVertices.Add(farPoint - position);
 							previousFarPointIndex = farPointIndex;
 							farPointIndex = invertAngledMeshVertices.Count - 1;
-							
+
 							invertAngledMeshVertices.Add(previousCloseTempPoint - position);
 							previousClosePointIndex = closePointIndex;
 							closePointIndex = invertAngledMeshVertices.Count - 1;
-							
+			
 							AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
+
+							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderInOut(direction, previousHit);
+							invertAngledMeshVertices.Add(previouseClosePointTolerated - _trans.position);
+							int previouseClosePointToleratedIndex = invertAngledMeshVertices.Count - 1;
 							
 							invertAngledMeshVertices.Add(hitPoint - position);
 							previousClosePointIndex = closePointIndex;
 							closePointIndex = invertAngledMeshVertices.Count - 1;
-							
+
+							AddNewTriangle(invertAngledTriangles, previousClosePointIndex, previouseClosePointToleratedIndex, closePointIndex);
 							AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, farPointIndex);
 							
 							Vector3 previousClosePoint = invertAngledMeshVertices[previousClosePointIndex] + position;
@@ -308,16 +313,25 @@ namespace LOS {
 								previousClosePointIndex = closePointIndex;
 								closePointIndex = invertAngledMeshVertices.Count - 1;
 								AddNewTriangle(invertAngledTriangles, closePointIndex, farPointIndex, previousClosePointIndex);
+								int closePointIndexBeforeNormalChange = closePointIndex;
 
-//								if (SMath.GetDegreeBetweenIndexVector(previousNormal.normalized, hitNormal.normalized) > 0) {
-//									hitPoint = GetToleranceHitPointNormalChange(previousNormal, hitPoint, previousCloseTempPoint);
-//								}
+								Vector3 toleratedHitpoint;
+								if (hit.distance > previousHit.distance) {
+									toleratedHitpoint = GetToleratedHitPointColliderInOut(direction, previousHit);
+								}
+								else {
+									toleratedHitpoint = GetToleratedHitPointColliderInOut(previousDirection, hit); 
+								}
+								invertAngledMeshVertices.Add(toleratedHitpoint - position);
+								previousClosePointIndex = closePointIndex;
+								closePointIndex = invertAngledMeshVertices.Count - 1;
 
 								invertAngledMeshVertices.Add(hitPoint - position);
 								previousClosePointIndex = closePointIndex;
 								closePointIndex = invertAngledMeshVertices.Count - 1;
-								AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, farPointIndex);
-								
+								AddNewTriangle(invertAngledTriangles, closePointIndexBeforeNormalChange, closePointIndex, farPointIndex);
+
+								AddNewTriangle(invertAngledTriangles, closePointIndexBeforeNormalChange, previousClosePointIndex, closePointIndex);
 							}
 							
 							colliderClosePointCount++;
@@ -331,8 +345,11 @@ namespace LOS {
 				else {
 					if (null != previousCollider) {
 						colliderClosePointCount = 0;
+
+
+						Vector3 previousCloseTempPointTolerated = GetToleratedHitPointColliderInOut(direction, previousHit);
 						
-						invertAngledMeshVertices.Add(previousCloseTempPoint - position);
+						invertAngledMeshVertices.Add(previousCloseTempPointTolerated - position);
 						previousClosePointIndex = closePointIndex;
 						closePointIndex = invertAngledMeshVertices.Count - 1;
 						AddNewTriangle(invertAngledTriangles, closePointIndex, farPointIndex, previousClosePointIndex);
@@ -367,6 +384,7 @@ namespace LOS {
 					previousCollider = null;
 				}
 				previousDirection = direction;
+				previousHit = hit;
 			}
 			
 			
