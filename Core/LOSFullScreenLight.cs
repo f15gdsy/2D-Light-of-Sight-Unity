@@ -283,7 +283,9 @@ namespace LOS {
 			
 							AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
 
-							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderInOut(direction, previousHit);
+//							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderInOut(direction, previousHit);
+//							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderInOut(previousDirection, hit);
+							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderOrNormalChange(previousDirection, previousHit, direction, hit);
 							invertAngledMeshVertices.Add(previouseClosePointTolerated - _trans.position);
 							int previouseClosePointToleratedIndex = invertAngledMeshVertices.Count - 1;
 							
@@ -315,13 +317,18 @@ namespace LOS {
 								AddNewTriangle(invertAngledTriangles, closePointIndex, farPointIndex, previousClosePointIndex);
 								int closePointIndexBeforeNormalChange = closePointIndex;
 
-								Vector3 toleratedHitpoint;
-								if (hit.distance > previousHit.distance) {
-									toleratedHitpoint = GetToleratedHitPointColliderInOut(direction, previousHit);
-								}
-								else {
-									toleratedHitpoint = GetToleratedHitPointColliderInOut(previousDirection, hit); 
-								}
+//								float sqrDistanceHit = (hitPoint - position).sqrMagnitude;
+//								float sqrDistancePreviousHit = (previousCloseTempPoint - position).sqrMagnitude ;
+//
+//								Vector3 toleratedHitpoint;
+//								if (sqrDistanceHit > sqrDistancePreviousHit) {
+//									toleratedHitpoint = GetToleratedHitPointColliderInOut(direction, previousHit);
+//								}
+//								else {
+//									toleratedHitpoint = GetToleratedHitPointColliderInOut(previousDirection, hit); 
+//								}
+
+								Vector3 toleratedHitpoint = GetToleratedHitPointColliderOrNormalChange(previousDirection, previousHit, direction, hit);
 								invertAngledMeshVertices.Add(toleratedHitpoint - position);
 								previousClosePointIndex = closePointIndex;
 								closePointIndex = invertAngledMeshVertices.Count - 1;
@@ -433,6 +440,18 @@ namespace LOS {
 		/// <param name="hit">Hit.</param>
 		private Vector3 GetToleratedHitPointColliderInOut (Vector3 targetDirection, RaycastHit hit) {
 			return _trans.position + hit.distance * targetDirection.normalized;
+		}
+
+		private Vector3 GetToleratedHitPointColliderOrNormalChange (Vector3 direction1, RaycastHit hit1, Vector3 direction2, RaycastHit hit2) {
+			float sqrDistance1 = (hit1.point - position).sqrMagnitude;
+			float sqrDistance2 = (hit2.point - position).sqrMagnitude;
+
+			if (sqrDistance1 > sqrDistance2) {
+				return GetToleratedHitPointColliderInOut(direction1, hit2);
+			}
+			else {
+				return GetToleratedHitPointColliderInOut(direction2, hit1);
+			}
 		}
 
 
