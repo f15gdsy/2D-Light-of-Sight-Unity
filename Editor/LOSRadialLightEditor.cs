@@ -10,11 +10,7 @@ namespace LOS.Editor {
 		protected SerializedProperty _flashFrequency;
 		protected SerializedProperty _flashOffset;
 
-		private bool _enableFlash;
-		private bool _previousEnableFlash;
-
-		private int _previousEditorFrequency;
-		private float _previousEditorOffset;
+		private static float _previousTime;
 		
 
 		protected override void OnEnable () {
@@ -24,8 +20,8 @@ namespace LOS.Editor {
 			_flashFrequency = serializedObject.FindProperty("flashFrequency");
 			_flashOffset = serializedObject.FindProperty("flashOffset");
 
-			var target = (LOSRadialLight) serializedObject.targetObject;
-			target.invertMode = false;
+			var light = (LOSRadialLight) target;
+			light.invertMode = false;
 
 			serializedObject.ApplyModifiedProperties();
 		}
@@ -36,34 +32,26 @@ namespace LOS.Editor {
 
 			EditorGUILayout.PropertyField(_radius);
 
-			_enableFlash = EditorGUILayout.Toggle("Enable Flash", _enableFlash);
-
-			if (_enableFlash) {
-				if (CheckChangeToEnableFlash()) {
-					_flashFrequency.intValue = _previousEditorFrequency;
-					_flashOffset.floatValue = _previousEditorOffset;
-				}
-				EditorGUILayout.PropertyField(_flashFrequency);
+			EditorGUILayout.PropertyField(_flashFrequency);
+			if (_flashFrequency.intValue > 0) {
 				EditorGUILayout.PropertyField(_flashOffset);
-			}
-			else if (CheckChangeToDisableFlash()) {
-				_previousEditorFrequency = _flashFrequency.intValue;
-				_previousEditorOffset = _flashOffset.floatValue;
-				_flashFrequency.intValue = 0;
-				_flashOffset.floatValue = 0;
-			}
 
-			_previousEnableFlash = _enableFlash;
+				if (_flashOffset.floatValue < 0) {
+					EditorGUILayout.HelpBox("Flash offset should not be less than 0. Make it positive to work.", MessageType.Error);
+				}
+			}
+			else if (_flashFrequency.intValue < 0) {
+				EditorGUILayout.HelpBox("Flash frequency should not be less than 0. Make it positive to work.", MessageType.Error);
+			}
 
 			serializedObject.ApplyModifiedProperties();
-		}
 
-		private bool CheckChangeToEnableFlash () {
-			return _enableFlash && !_previousEnableFlash;
-		}
-
-		private bool CheckChangeToDisableFlash () {
-			return !_enableFlash && _previousEnableFlash;
+			if (_flashFrequency.intValue > 0 && _flashOffset.floatValue > 0) {
+				EditorUtility.SetDirty(target);
+				var light = (LOSRadialLight) target;
+				light.timeFromLastFlash += Time.realtimeSinceStartup - _previousTime;
+				_previousTime = Time.realtimeSinceStartup;
+			}
 		}
 	}
 }

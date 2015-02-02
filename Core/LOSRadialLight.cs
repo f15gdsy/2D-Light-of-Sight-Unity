@@ -7,7 +7,7 @@ namespace LOS {
 	public class LOSRadialLight : LOSLightBase {
 
 		// Radius
-		public float radius = 10;
+		public float radius = 5;
 
 		private float _previousRadius;
 		private float _radius;
@@ -21,6 +21,20 @@ namespace LOS {
 
 		private float _timeFromLastFlash;
 
+		public float timeFromLastFlash {
+			get {
+				return _timeFromLastFlash;
+			}
+			set {
+				if (!Application.isPlaying) {
+					_timeFromLastFlash = value;
+				}
+				else {
+					Debug.LogError("Cannot use this API at runtime");
+				}
+			}
+		}
+
 
 		protected override void Awake () {
 			base.Awake ();
@@ -29,10 +43,13 @@ namespace LOS {
 		}
 
 		void Update () {
+			Debug.Log("Update");
 			if (flashFrequency > 0 && flashOffset > 0) {
-				_timeFromLastFlash += Time.deltaTime;
+					_timeFromLastFlash += Time.deltaTime;
+
 				if (_timeFromLastFlash > 1f / flashFrequency) {		// flashFrequency is int
 					_timeFromLastFlash = 0;
+					Debug.Log("Change Radius");
 					_radius = Random.Range(radius - flashOffset, radius + flashOffset);
 				}
 			}
@@ -47,6 +64,7 @@ namespace LOS {
 
 			_previousRadius = _radius;
 			if (flashFrequency <= 0 || flashOffset <= 0) {
+				Debug.Log("Upate info");
 				_radius = radius;
 			}
 		}
@@ -56,6 +74,7 @@ namespace LOS {
 		}
 
 		protected override void ForwardDraw () {
+			Debug.Log("Draw");
 			List<Vector3> meshVertices = new List<Vector3>();
 			List<int> triangles = new List<int>();
 			

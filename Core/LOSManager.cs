@@ -116,11 +116,14 @@ namespace LOS {
 
 
 		void LateUpdate () {
-			foreach (var light in lights) {
+			UpdateLights();
+		}
 
+		public void UpdateLights () {
+			foreach (var light in lights) {
 				light.TryDraw();
 			}
-
+			
 			UpdatePreviousInfo();
 		}
 

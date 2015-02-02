@@ -13,16 +13,19 @@ namespace LOS.Editor {
 		protected SerializedProperty _coneAngle;
 		protected SerializedProperty _faceAngle;
 		protected SerializedProperty _obstacleLayer;
-		protected SerializedProperty _defaultMaterial;
+		protected SerializedProperty _material;
 
 		protected virtual void OnEnable () {
+			var light = (LOSLightBase) target;
+			EditorUtility.SetSelectedWireframeHidden(light.renderer, true);
+
 			_isStatic = serializedObject.FindProperty("isStatic");
 			_obstacleLayer = serializedObject.FindProperty("obstacleLayer");
 			_degreeStep = serializedObject.FindProperty("degreeStep");
 			_coneAngle = serializedObject.FindProperty("coneAngle");
 			_faceAngle = serializedObject.FindProperty("faceAngle");
 			_color = serializedObject.FindProperty("color");
-			_defaultMaterial = serializedObject.FindProperty("defaultMaterial");
+			_material = serializedObject.FindProperty("material");
 		}
 
 		public override void OnInspectorGUI () {
@@ -38,9 +41,7 @@ namespace LOS.Editor {
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(_color);
-			EditorGUILayout.PropertyField(_defaultMaterial);
-
-			serializedObject.ApplyModifiedProperties();
+			EditorGUILayout.PropertyField(_material);
 		}
 	}
 
