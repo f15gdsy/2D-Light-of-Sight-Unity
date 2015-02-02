@@ -20,7 +20,7 @@ namespace LOS {
 
 		// Light Settings
 		[Tooltip("The precision of the light collision test. Measured in degrees.")]
-		public float degreeStep = 0.1f;
+		public float degreeStep = 1f;
 
 		[Tooltip("Draws the light in invert mode or not.")]
 		public bool invertMode = false;
@@ -32,7 +32,7 @@ namespace LOS {
 
 		// Outlook
 		public Color color = Color.yellow;
-		public Material defaultMaterial;
+		public Material material;
 
 		protected Color _previousColor;
 
@@ -44,6 +44,19 @@ namespace LOS {
 			base.Awake();
 
 			coneAngle = SMath.ClampDegree0To360(coneAngle);
+
+			var meshFilter = GetComponent<MeshFilter>();
+			if (meshFilter == null) {
+				meshFilter = gameObject.AddComponent<MeshFilter>();
+			}
+			_mesh = meshFilter.sharedMesh;
+			if (_mesh == null) {
+				_mesh = new Mesh();
+				meshFilter.sharedMesh = _mesh;
+			}
+			
+			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
+			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
 		}
 
 		protected virtual void OnEnable () {
@@ -56,26 +69,12 @@ namespace LOS {
 			}
 		}
 
-		void Start () {
-			var meshFilter = GetComponent<MeshFilter>();
-			if (meshFilter == null) {
-				meshFilter = gameObject.AddComponent<MeshFilter>();
-			}
-			_mesh = meshFilter.sharedMesh;
-			if (_mesh == null) {
-				_mesh = new Mesh();
-				meshFilter.sharedMesh = _mesh;
-			}
 
+		void Start () {
 			if (renderer == null) {
 				gameObject.AddComponent<MeshRenderer>();
-				renderer.material = defaultMaterial;
 			}
-
-			renderer.material = defaultMaterial;
-
-			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
-			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
+			renderer.material = material;
 
 			DoDraw();
 		}

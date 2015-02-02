@@ -117,6 +117,7 @@ namespace LOS {
 
 		void LateUpdate () {
 			foreach (var light in lights) {
+
 				light.TryDraw();
 			}
 
@@ -211,10 +212,10 @@ namespace LOS {
 			if (degreeA == 360) {
 				degreeA = 0;
 			}
-			if (degreeA > degreeB) {
+			if (degreeA >= degreeB) {
 				degreeA -= 360;
 			}
-		
+					
 			Dictionary<float, Vector3> tempResults = new Dictionary<float, Vector3>();
 
 			foreach (var line in viewbox) {

@@ -283,8 +283,6 @@ namespace LOS {
 			
 							AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
 
-//							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderInOut(direction, previousHit);
-//							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderInOut(previousDirection, hit);
 							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderOrNormalChange(previousDirection, previousHit, direction, hit);
 							invertAngledMeshVertices.Add(previouseClosePointTolerated - _trans.position);
 							int previouseClosePointToleratedIndex = invertAngledMeshVertices.Count - 1;
