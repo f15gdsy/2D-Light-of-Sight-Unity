@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace LOS {
-
+	
 	public abstract class LOSLightBase : LOSObjectBase {
 
 		// Cone Light
@@ -30,9 +30,10 @@ namespace LOS {
 
 		protected float _raycastDistance;
 
-		// Look
-		public Color color;
+		// Outlook
+		public Color color = Color.yellow;
 		public Material defaultMaterial;
+
 		protected Color _previousColor;
 
 		// Cache
@@ -45,12 +46,26 @@ namespace LOS {
 			coneAngle = SMath.ClampDegree0To360(coneAngle);
 		}
 
+		protected virtual void OnEnable () {
+			LOSManager.instance.AddLight(this);
+		}
+
+		protected virtual void OnDisable () {
+			if (LOSManager.TryGetInstance() != null) {
+				LOSManager.instance.RemoveLight(this);
+			}
+		}
+
 		void Start () {
 			var meshFilter = GetComponent<MeshFilter>();
 			if (meshFilter == null) {
 				meshFilter = gameObject.AddComponent<MeshFilter>();
 			}
-			_mesh = meshFilter.mesh;
+			_mesh = meshFilter.sharedMesh;
+			if (_mesh == null) {
+				_mesh = new Mesh();
+				meshFilter.sharedMesh = _mesh;
+			}
 
 			if (renderer == null) {
 				gameObject.AddComponent<MeshRenderer>();
@@ -70,7 +85,7 @@ namespace LOS {
 		/// 
 		/// In all LOS lights, this is where the checkings & drawings take place.
 		/// </summary>
-		void LateUpdate () {
+		public void TryDraw () {
 			if (SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.camera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
 				UpdatePreviousInfo();
 				DoDraw();

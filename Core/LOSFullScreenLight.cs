@@ -400,6 +400,7 @@ namespace LOS {
 				if (previousCollider != null) {
 					if (closePointAtDegree0Index == -1) {
 						AddNewTrianglesBetweenPoints4Corners(invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, closePointIndex);
+						AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
 					}
 					else {
 						if (colliderClosePointCount > 1) {

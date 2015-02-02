@@ -15,7 +15,6 @@ namespace LOS.Editor {
 		protected SerializedProperty _obstacleLayer;
 		protected SerializedProperty _defaultMaterial;
 
-
 		protected virtual void OnEnable () {
 			_isStatic = serializedObject.FindProperty("isStatic");
 			_obstacleLayer = serializedObject.FindProperty("obstacleLayer");
