@@ -23,8 +23,10 @@ namespace LOS.Editor {
 
 			light.material = Resources.Load<Material>("Materials/RadialLight");
 
-
 			PlaceGameObjectAccordingToCamera(go);
+
+			Selection.activeGameObject = go;
+			Undo.RegisterCreatedObjectUndo(go, "Undo creating Radial Light");
 		}
 
 	
@@ -38,6 +40,9 @@ namespace LOS.Editor {
 			light.material = Resources.Load<Material>("Materials/Basic");
 
 			PlaceGameObjectAccordingToCamera(go);
+
+			Selection.activeGameObject = go;
+			Undo.RegisterCreatedObjectUndo(go, "Undo creating Full Screen Light");
 		}
 
 		[MenuItem("GameObject/LOS Lighting/Create Invert Full Screen Light", false, 92)]
@@ -51,6 +56,9 @@ namespace LOS.Editor {
 			light.invertMode = true;
 			
 			PlaceGameObjectAccordingToCamera(go);
+
+			Selection.activeGameObject = go;
+			Undo.RegisterCreatedObjectUndo(go, "Undo creating Invert Full Screen Light");
 		}
 
 		private static bool CheckLOSCameraExistence () {

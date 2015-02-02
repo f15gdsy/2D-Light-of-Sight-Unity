@@ -116,6 +116,7 @@ namespace LOS {
 
 
 		void LateUpdate () {
+			Debug.Log(lights.Count);
 			UpdateLights();
 		}
 

@@ -30,7 +30,7 @@ namespace LOS {
 					_timeFromLastFlash = value;
 				}
 				else {
-					Debug.LogError("Cannot use this API at runtime");
+					// Not supposed to use this API in play mode.
 				}
 			}
 		}
@@ -43,13 +43,11 @@ namespace LOS {
 		}
 
 		void Update () {
-			Debug.Log("Update");
 			if (flashFrequency > 0 && flashOffset > 0) {
 					_timeFromLastFlash += Time.deltaTime;
 
 				if (_timeFromLastFlash > 1f / flashFrequency) {		// flashFrequency is int
 					_timeFromLastFlash = 0;
-					Debug.Log("Change Radius");
 					_radius = Random.Range(radius - flashOffset, radius + flashOffset);
 				}
 			}
@@ -64,7 +62,6 @@ namespace LOS {
 
 			_previousRadius = _radius;
 			if (flashFrequency <= 0 || flashOffset <= 0) {
-				Debug.Log("Upate info");
 				_radius = radius;
 			}
 		}
@@ -74,7 +71,7 @@ namespace LOS {
 		}
 
 		protected override void ForwardDraw () {
-			Debug.Log("Draw");
+			Debug.Log("Draw: " + gameObject.name + "  radius: " + radius + "  _radius:" + _radius + "  frequency: " + flashFrequency);
 			List<Vector3> meshVertices = new List<Vector3>();
 			List<int> triangles = new List<int>();
 			

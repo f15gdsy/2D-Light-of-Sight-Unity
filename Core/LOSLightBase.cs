@@ -30,6 +30,7 @@ namespace LOS {
 
 		protected float _raycastDistance;
 
+
 		// Outlook
 		public Color color = Color.yellow;
 		public Material material;
@@ -49,10 +50,10 @@ namespace LOS {
 			if (meshFilter == null) {
 				meshFilter = gameObject.AddComponent<MeshFilter>();
 			}
-			_mesh = meshFilter.sharedMesh;
+
 			if (_mesh == null) {
 				_mesh = new Mesh();
-				meshFilter.sharedMesh = _mesh;
+				meshFilter.mesh = _mesh;
 			}
 			
 			Vector2 screenSize = SHelper.GetScreenSizeInWorld();

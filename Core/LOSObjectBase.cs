@@ -2,7 +2,7 @@
 using System.Collections;
 
 namespace LOS {
-
+	
 	[ExecuteInEditMode]
 	public class LOSObjectBase : MonoBehaviour {
 

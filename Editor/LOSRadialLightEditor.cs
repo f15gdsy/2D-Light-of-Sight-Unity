@@ -25,6 +25,8 @@ namespace LOS.Editor {
 
 			serializedObject.ApplyModifiedProperties();
 		}
+
+
 	
 
 		public override void OnInspectorGUI () {
@@ -46,12 +48,12 @@ namespace LOS.Editor {
 
 			serializedObject.ApplyModifiedProperties();
 
-			if (_flashFrequency.intValue > 0 && _flashOffset.floatValue > 0) {
-				EditorUtility.SetDirty(target);
-				var light = (LOSRadialLight) target;
-				light.timeFromLastFlash += Time.realtimeSinceStartup - _previousTime;
-				_previousTime = Time.realtimeSinceStartup;
-			}
+//			if (_flashFrequency.intValue > 0 && _flashOffset.floatValue > 0) {
+//				EditorUtility.SetDirty(target);
+//				var light = (LOSRadialLight) target;
+//				light.timeFromLastFlash += Time.realtimeSinceStartup - _previousTime;
+//				_previousTime = Time.realtimeSinceStartup;
+//			}
 		}
 	}
 }
