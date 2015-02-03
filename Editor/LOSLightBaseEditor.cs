@@ -20,10 +20,7 @@ namespace LOS.Editor {
 
 			var light = (LOSLightBase) target;
 
-			Debug.Log(target.name + " " + target.GetInstanceID());
-
 			EditorUtility.SetSelectedWireframeHidden(light.renderer, true);
-			light.enabled = true;
 
 			_isStatic = serializedObject.FindProperty("isStatic");
 			_obstacleLayer = serializedObject.FindProperty("obstacleLayer");
@@ -34,12 +31,6 @@ namespace LOS.Editor {
 			_material = serializedObject.FindProperty("material");
 		}
 
-		protected virtual void OnDisable () {
-			if (target != null) {
-				var light = (LOSLightBase) target;
-				light.enabled = false;
-			}
-		}
 
 		public override void OnInspectorGUI () {
 			serializedObject.Update();

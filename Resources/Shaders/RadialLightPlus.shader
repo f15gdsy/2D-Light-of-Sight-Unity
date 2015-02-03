@@ -49,7 +49,8 @@
             fixed4 frag(v2f i) : COLOR {
             	_intensity = 1;
                 float4 _MainTex_var = tex2D(_MainTex, i.uv0);
-                return fixed4(i.color.rgb * _intensity, _MainTex_var.r * i.color.a);
+                float texRGBAverage = (_MainTex_var.r + _MainTex_var.g + _MainTex_var.b) / 3;
+                return fixed4(i.color.rgb * _intensity, texRGBAverage * i.color.a);
             }
             ENDCG
         }

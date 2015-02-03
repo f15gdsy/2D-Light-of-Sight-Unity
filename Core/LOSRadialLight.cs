@@ -71,7 +71,6 @@ namespace LOS {
 		}
 
 		protected override void ForwardDraw () {
-			Debug.Log("Draw: " + gameObject.name + "  radius: " + radius + "  _radius:" + _radius + "  frequency: " + flashFrequency);
 			List<Vector3> meshVertices = new List<Vector3>();
 			List<int> triangles = new List<int>();
 			
