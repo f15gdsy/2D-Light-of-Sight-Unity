@@ -30,7 +30,7 @@ public class Move : MonoBehaviour {
 			direction.x = 1;
 		}
 
-		direction *= speed;
+		direction = speed * direction.normalized;
 
 		_trans.position = _trans.position + direction;
 	}

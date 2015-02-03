@@ -22,6 +22,7 @@ namespace LOS {
 		private List<ViewBoxLine> _viewbox;
 		private Transform _losCameraTrans;
 		private LOSCamera _losCamera;
+		private bool _isDirty;
 
 
 		public static LOSManager instance {
@@ -88,7 +89,7 @@ namespace LOS {
 				if (_losCamera == null) {
 					var losCameras = FindObjectsOfType<LOSCamera>();
 					if (losCameras.Length == 0) {
-						Debug.LogError("No LOSCamera found!");
+						Debug.LogError("No LOSCamera found! Please add the LOSCamera component to a camera.");
 					}
 					else if (losCameras.Length > 1) {
 						Debug.LogError("More than 1 LOSCamera found!");
@@ -153,6 +154,8 @@ namespace LOS {
 		}
 
 		public void UpdatePreviousInfo () {
+			_isDirty = false;
+
 			losCamera.UpdatePreviousInfo();
 
 			foreach (LOSObstacle obstacle in obstacles) {
@@ -250,12 +253,14 @@ namespace LOS {
 		
 		public void AddObstacle (LOSObstacle obstacle) {
 			if (!obstacles.Contains(obstacle)) {
+				_isDirty = true;
 				obstacles.Add(obstacle);
 			}
 		}
 
 		public void RemoveObstacle (LOSObstacle obstacle) {
 			obstacles.Remove(obstacle);
+			_isDirty = true;
 		}
 
 		public void AddLight (LOSLightBase light) {
@@ -269,6 +274,8 @@ namespace LOS {
 		}
 
 		public bool CheckDirty () {
+			if (_isDirty) return true;
+
 			bool result = false;
 			foreach (LOSObstacle obstacle in obstacles) {
 				if (!obstacle.isStatic && obstacle.CheckDirty()) {

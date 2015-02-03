@@ -34,7 +34,7 @@
             }
             
             fixed4 frag(v2f i) : COLOR {
-                return fixed4(i.color.rgb, i.color.a);
+                return i.color;
             }
             ENDCG
         }

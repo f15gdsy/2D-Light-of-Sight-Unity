@@ -4,7 +4,7 @@ using System.Collections;
 namespace LOS {
 	
 	[ExecuteInEditMode]
-	public class LOSObjectBase : MonoBehaviour {
+	public abstract class LOSObjectBase : MonoBehaviour {
 
 		[Tooltip("Will not be considered in the LOS system.")]
 		public bool isStatic;

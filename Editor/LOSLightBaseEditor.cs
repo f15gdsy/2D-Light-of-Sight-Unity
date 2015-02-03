@@ -14,6 +14,8 @@ namespace LOS.Editor {
 		protected SerializedProperty _faceAngle;
 		protected SerializedProperty _obstacleLayer;
 		protected SerializedProperty _material;
+		protected SerializedProperty _orderInLayer;
+		protected SerializedProperty _sortingLayer;
 
 		protected virtual void OnEnable () {
 			serializedObject.Update();
@@ -28,6 +30,8 @@ namespace LOS.Editor {
 			_coneAngle = serializedObject.FindProperty("coneAngle");
 			_faceAngle = serializedObject.FindProperty("faceAngle");
 			_color = serializedObject.FindProperty("color");
+			_sortingLayer = serializedObject.FindProperty("sortingLayer");
+			_orderInLayer = serializedObject.FindProperty("orderInLayer");
 			_material = serializedObject.FindProperty("material");
 		}
 
@@ -48,6 +52,8 @@ namespace LOS.Editor {
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(_color);
+			EditorGUILayout.PropertyField(_sortingLayer);
+			EditorGUILayout.PropertyField(_orderInLayer);
 			EditorGUILayout.PropertyField(_material);
 		}
 	}

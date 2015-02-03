@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace LOS {
 	
+	/// <summary>
+	/// Base class for lights.
+	/// </summary>
 	public abstract class LOSLightBase : LOSObjectBase {
 
 		// Cone Light
@@ -17,6 +20,7 @@ namespace LOS {
 		protected float _previousLightAngle;
 		protected float _startAngle;
 		protected float _endAngle;
+
 
 		// Light Settings
 		[Tooltip("The precision of the light collision test. Measured in degrees.")]
@@ -34,11 +38,20 @@ namespace LOS {
 		// Outlook
 		public Color color = Color.yellow;
 		public Material material;
+		public int orderInLayer;
+		public int sortingLayer;
 
 		protected Color _previousColor;
+		protected int _previousOrderInLayer;
+		protected int _previousSortingLayer;
+
 
 		// Cache
 		protected Mesh _mesh;
+		protected LayerMask _previousObstacleLayer;
+		protected bool _previousInvertMode;
+		protected float _previousDegreeStep;
+
 
 
 		protected override void Awake () {
@@ -75,16 +88,14 @@ namespace LOS {
 			if (renderer == null) {
 				gameObject.AddComponent<MeshRenderer>();
 			}
+
+			UpdateRenderQueue();
+			UpdateSortingLayer();
 			renderer.material = material;
 
 			DoDraw();
 		}
 
-		/// <summary>
-		/// Lates the update.
-		/// 
-		/// In all LOS lights, this is where the checkings & drawings take place.
-		/// </summary>
 		public void TryDraw () {
 			if (LOSManager.instance.CheckDirty() || CheckDirty()) {
 				UpdatePreviousInfo();
@@ -92,6 +103,12 @@ namespace LOS {
 			}
 			if (CheckColorDirty()) {
 				UpdateColor();
+			}
+			if (CheckSortingLayerDirty()) {
+				UpdateSortingLayer();
+			}
+			if (CheckRenderQueueDirty()) {
+				UpdateRenderQueue();
 			}
 		}
 
@@ -110,16 +127,30 @@ namespace LOS {
 			_previousFaceAngle = faceAngle;
 			_previousLightAngle = coneAngle;
 			_previousColor = color;
+			_previousObstacleLayer = obstacleLayer;
+			_previousInvertMode = invertMode;
+			_previousDegreeStep = degreeStep;
 		}
 
 		public override bool CheckDirty () {
 			return !isStatic && (!_previousPosition.Equals(position) || 
 				!_previousFaceAngle.Equals(faceAngle) || 
-					!_previousLightAngle.Equals(coneAngle));
+					!_previousLightAngle.Equals(coneAngle)) ||
+				_previousObstacleLayer != obstacleLayer ||
+					_previousInvertMode != invertMode || 
+					_previousDegreeStep != degreeStep;
 		}
 
 		private bool CheckColorDirty () {
 			return _previousColor != color;
+		}
+
+		private bool CheckSortingLayerDirty () {
+			return _previousSortingLayer != sortingLayer;
+		}
+
+		private bool CheckRenderQueueDirty () {
+			return _previousOrderInLayer != orderInLayer;
 		}
 
 		private void DoDraw () {
@@ -240,13 +271,23 @@ namespace LOS {
 
 		protected void UpdateColor () {
 			_previousColor = color;
-			
-			
+
 			Color32[] colors32 = new Color32[_mesh.vertices.Length];
 			for (int i=0; i<colors32.Length; i++) {
 				colors32[i] = color;
 			}
 			_mesh.colors32 = colors32;
+		}
+
+		protected void UpdateSortingLayer () {
+			renderer.sortingLayerID = sortingLayer;
+			_previousSortingLayer = sortingLayer;
+		}
+
+		protected void UpdateRenderQueue () {
+			renderer.sortingOrder = orderInLayer;
+//			material.renderQueue = orderInLayer + 3000;		// 3000 is Transparent's render queue
+			_previousOrderInLayer = orderInLayer;
 		}
 
 		protected void UpdateUVs (Vector3[] vertices) {

@@ -6,15 +6,7 @@ namespace LOS.Editor {
 
 	public class LOSMenu : UnityEditor.Editor {
 
-		void Update () {
-			Debug.Log("Update");
-		}
-
-		void LateUpdate () {
-			Debug.Log("Late Update");
-		}
-
-		[MenuItem("GameObject/LOS Lighting/Create Radial Light", false, 90)]
+		[MenuItem("GameObject/LOS 2D Lighting/Radial Light", false, 50)]
 		public static void CreateRadialLight () {
 			CheckLOSCameraExistence();
 
@@ -30,7 +22,7 @@ namespace LOS.Editor {
 		}
 
 	
-		[MenuItem("GameObject/LOS Lighting/Create Full Screen Light", false, 91)]
+		[MenuItem("GameObject/LOS 2D Lighting/Full Screen Light", false, 51)]
 		public static void CreateFullScreenForwardLight () {
 			CheckLOSCameraExistence();
 			
@@ -45,7 +37,7 @@ namespace LOS.Editor {
 			Undo.RegisterCreatedObjectUndo(go, "Undo creating Full Screen Light");
 		}
 
-		[MenuItem("GameObject/LOS Lighting/Create Invert Full Screen Light", false, 92)]
+		[MenuItem("GameObject/LOS 2D Lighting/Invert Full Screen Light", false, 52)]
 		public static void CreateInvertFullScreenForwardLight () {
 			CheckLOSCameraExistence();
 			
