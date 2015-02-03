@@ -86,7 +86,7 @@ namespace LOS {
 		/// In all LOS lights, this is where the checkings & drawings take place.
 		/// </summary>
 		public void TryDraw () {
-			if (SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.camera) && ((LOSManager.instance.CheckDirty() || CheckDirty()))) {
+			if (LOSManager.instance.CheckDirty() || CheckDirty()) {
 				UpdatePreviousInfo();
 				DoDraw();
 			}

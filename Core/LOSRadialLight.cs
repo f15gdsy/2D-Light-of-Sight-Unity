@@ -54,7 +54,8 @@ namespace LOS {
 		}
 
 		public override bool CheckDirty () {
-			return (base.CheckDirty () || _radius != _previousRadius || _radius != radius) && radius > 0;
+			bool withinScreen = SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.camera, _radius);
+			return withinScreen && ((base.CheckDirty () || _radius != _previousRadius || _radius != radius) && radius > 0);
 		}
 
 		public override void UpdatePreviousInfo () {

@@ -69,10 +69,12 @@ public static class SHelper {
 		return new Vector2(2 * width, 2 * height);
 	}
 
-	public static bool CheckWithinScreen (Vector2 position, Camera camera) {
+	public static bool CheckWithinScreen (Vector2 position, Camera camera, float distance) {
+		Vector3 minScreenPosition = camera.WorldToScreenPoint(new Vector2(position.x - distance, position.y - distance));
 		Vector3 screenPosition = camera.WorldToScreenPoint(position);
-		return !(screenPosition.x <= 0 || screenPosition.x >= camera.pixelWidth || 
-		         screenPosition.y <= 0 || screenPosition.y >= camera.pixelHeight);
+		float distanceInScreen = Math.Abs(screenPosition.x - minScreenPosition.x);
+		return !(screenPosition.x + distanceInScreen <= 0 || screenPosition.x - distanceInScreen >= camera.pixelWidth || 
+		         screenPosition.y + distanceInScreen <= 0 || screenPosition.y - distanceInScreen >= camera.pixelHeight);
 	}
 
 }
