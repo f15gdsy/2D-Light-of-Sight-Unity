@@ -1,6 +1,7 @@
-# 2D-Light-of-Sight-Unity v0.9 alpha
+# 2D Light of Sight Unity (v0.9 alpha)
 <br>
 
+###
 ## What is it?
 A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [this] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/los_radial_light_0.png) and [this] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/los_full_screen_light_0.png).
 
