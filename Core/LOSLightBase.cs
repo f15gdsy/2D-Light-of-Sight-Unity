@@ -165,11 +165,11 @@ namespace LOS {
 			}
 		}
 
-		protected void AddNewTrianglesBetweenPoints2Corners (List<int> triangles, List<Vector3> vertices, int pointAIndex, int pointBIndex) {
+		protected void AddNewTrianglesBetweenPoints2Corners (List<int> triangles, List<Vector3> vertices, int pointAIndex, int pointBIndex, bool give4CornersWhenAEqualsB = false) {
 			Vector3 pointA = vertices[pointAIndex] + position;
 			Vector3 pointB = vertices[pointBIndex] + position;
 			
-			List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(pointA, pointB, position);
+			List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(pointA, pointB, position, give4CornersWhenAEqualsB);
 			switch (corners.Count) {
 			case 0:
 				break;
@@ -189,11 +189,11 @@ namespace LOS {
 			}
 		}
 
-		protected void AddNewTrianglesBetweenPoints4Corners (List<int> triangles, List<Vector3> vertices,int pointAIndex, int pointBIndex, int centerIndex) {
+		protected void AddNewTrianglesBetweenPoints4Corners (List<int> triangles, List<Vector3> vertices,int pointAIndex, int pointBIndex, int centerIndex, bool give4CornersWhenAEqualB = false) {
 			Vector3 pointA = vertices[pointAIndex] + position;
 			Vector3 pointB = vertices[pointBIndex] + position;
 
-			List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(pointA, pointB, position);
+			List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(pointA, pointB, position, give4CornersWhenAEqualB);
 			switch (corners.Count) {
 			case 0:
 				AddNewTriangle(triangles, pointAIndex, centerIndex, pointBIndex);

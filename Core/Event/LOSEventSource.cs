@@ -9,6 +9,7 @@ namespace LOS.Event {
 		private Transform _trans;
 
 		public LayerMask triggerLayers;
+		public LayerMask obstacleLayers;
 		public float distance;
 
 
@@ -32,13 +33,15 @@ namespace LOS.Event {
 			List<LOSEventTrigger> triggered = new List<LOSEventTrigger>();
 			List<LOSEventTrigger> notTriggered = new List<LOSEventTrigger>();
 
+			LayerMask mask = triggerLayers | obstacleLayers;
+
 			foreach (LOSEventTrigger trigger in triggers) {
 				Vector3 direction = trigger.position - _trans.position;
 
 				if (direction.sqrMagnitude <= distance) {	// Within distance
 					if (triggered.Contains(trigger)) continue;		// May be added previously
 
-					if (Physics.Raycast(_trans.position, direction, out hit, triggerLayers)) {
+					if (Physics.Raycast(_trans.position, direction, out hit, distance, mask)) {
 						GameObject hitGo = hit.collider.gameObject;
 
 						if (hitGo == trigger.gameObject) {
@@ -47,11 +50,13 @@ namespace LOS.Event {
 						else {
 							notTriggered.Add(trigger);
 
-							LOSEventTrigger triggerToAdd = hitGo.GetComponentInChildren<LOSEventTrigger>();
-							if (triggerToAdd == null) {
-								triggerToAdd = hitGo.GetComponentInParent<LOSEventTrigger>();
+							if (SHelper.CheckGameObjectInLayer(hitGo, triggerLayers)) {
+								LOSEventTrigger triggerToAdd = hitGo.GetComponentInChildren<LOSEventTrigger>();
+								if (triggerToAdd == null) {
+									triggerToAdd = hitGo.GetComponentInParent<LOSEventTrigger>();
+								}
+								triggered.Add(triggerToAdd);
 							}
-							triggered.Add(triggerToAdd);
 						}
 					}
 				}

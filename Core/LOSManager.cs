@@ -207,7 +207,7 @@ namespace LOS {
 		}
 
 		// Works in counter-clock wise, pointA is the one with smaller angle against vector (1, 0)
-		public List<Vector3> GetViewboxCornersBetweenPoints (Vector3 pointA, Vector3 pointB, Vector3 origin) {
+		public List<Vector3> GetViewboxCornersBetweenPoints (Vector3 pointA, Vector3 pointB, Vector3 origin, bool give4CornersWhenAEqualB) {
 			pointA.z = 0;
 			pointB.z = 0;
 			origin.z = 0;
@@ -218,7 +218,7 @@ namespace LOS {
 			if (degreeA == 360) {
 				degreeA = 0;
 			}
-			if (degreeA >= degreeB) {
+			if (degreeA > degreeB + 0.001f || (degreeA > degreeB && degreeA < degreeB + 0.001f && give4CornersWhenAEqualB)) {	// 0.001f is the tolerance
 				degreeA -= 360;
 			}
 					

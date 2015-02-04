@@ -35,7 +35,7 @@ namespace LOS.Event {
 		}
 
 		public bool CheckWithinScreen () {
-			return SHelper.CheckWithinScreen(_trans.position, LOSManager.instance.losCamera.unityCamera, 0);
+			return SHelper.CheckWithinScreen(_trans.position, LOSManager.instance.losCamera.unityCamera, 5);
 		}
 
 		public void TriggeredByLight (LOSEventSource source) {

@@ -7,7 +7,7 @@ namespace LOS.Event {
 	public class LOSEventManager : MonoBehaviour {
 
 		// Timing
-		public float updateFrequency;
+		public int updateFrequency = 30;
 		private float _timeSinceLastUpdate;
 
 
@@ -57,7 +57,7 @@ namespace LOS.Event {
 		void Update () {
 			_timeSinceLastUpdate += Time.deltaTime;
 
-			if (_timeSinceLastUpdate >= 1 / updateFrequency && !_isProcessing) {
+			if (_timeSinceLastUpdate >= 1f / updateFrequency && !_isProcessing) {
 				_timeSinceLastUpdate = 0;
 
 				ResetSettings();

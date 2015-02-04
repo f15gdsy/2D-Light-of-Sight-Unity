@@ -77,4 +77,7 @@ public static class SHelper {
 		         screenPosition.y + distanceInScreen <= 0 || screenPosition.y - distanceInScreen >= camera.pixelHeight);
 	}
 
+	public static bool CheckGameObjectInLayer (GameObject go, int layerMask) {
+		return (layerMask & (1 << go.layer)) > 0;
+	}
 }
