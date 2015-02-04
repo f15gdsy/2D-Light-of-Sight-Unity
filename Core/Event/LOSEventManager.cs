@@ -97,6 +97,9 @@ namespace LOS.Event {
 		}
 
 		public void RemoveEventSource (LOSEventSource source) {
+			foreach (LOSEventTrigger trigger in _triggers) {
+				trigger.NotTriggeredBySource(source);
+			}
 			_sources.Remove(source);
 		}
 

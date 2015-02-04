@@ -17,7 +17,7 @@ public class ChangeTextColorOnLOSEvent : MonoBehaviour {
 		LOSEventTrigger trigger = GetComponent<LOSEventTrigger>();
 		trigger.OnNotTriggered += OnNotLit;
 		trigger.OnTriggered += OnLit;
-		
+
 		OnNotLit();
 	}
 	
@@ -25,7 +25,7 @@ public class ChangeTextColorOnLOSEvent : MonoBehaviour {
 		_text.color = notLitColor;
 	}
 	
-	private void OnLit (LOSEventSource source) {
+	private void OnLit () {
 		_text.color = litColor;
 	}
 }

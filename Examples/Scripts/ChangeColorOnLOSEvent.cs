@@ -24,7 +24,7 @@ public class ChangeColorOnLOSEvent : MonoBehaviour {
 		_renderer.color = notLitColor;
 	}
 
-	private void OnLit (LOSEventSource source) {
+	private void OnLit () {
 		_renderer.color = litColor;
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace LOS.Event {
 
@@ -12,16 +13,26 @@ namespace LOS.Event {
 
 
 		// Events & Trigger Info
-		public delegate void HandleLightDelegate (LOSEventSource source);
-		public delegate void HandleNoLightDelegate ();
-		public event HandleLightDelegate OnTriggered;
-		public event HandleNoLightDelegate OnNotTriggered;
+		public delegate void HandleSourceDelegate (LOSEventSource source);
+		public delegate void HandleNoSourceDelegate ();
+		public event HandleSourceDelegate OnTriggeredBySource;
+		public event HandleSourceDelegate OnNotTriggeredBySource;
+		public event HandleNoSourceDelegate OnTriggered;
+		public event HandleNoSourceDelegate OnNotTriggered;
 		private bool _triggered;
 		public bool triggered {get {return _triggered;}}
+
+		private List<LOSEventSource> _triggerSources;
+
 
 
 		void Awake () {
 			_trans = transform;
+			_triggerSources = new List<LOSEventSource>();
+		}
+
+		void Start () {
+			NotTriggered();
 		}
 
 		void OnEnable () {
@@ -38,23 +49,37 @@ namespace LOS.Event {
 			return SHelper.CheckWithinScreen(_trans.position, LOSManager.instance.losCamera.unityCamera, 5);
 		}
 
-		public void TriggeredByLight (LOSEventSource source) {
-			if (!_triggered) {
-				_triggered = true;
+		public void TriggeredBySource (LOSEventSource source) {
+			if (!_triggerSources.Contains(source)) {
+				_triggerSources.Add(source);
 
-				if (OnTriggered != null) {
-					OnTriggered(source);
+				if (OnTriggeredBySource != null) {
+					OnTriggeredBySource(source);
+				}
+				if (_triggerSources.Count == 1 && OnTriggered != null) {
+					OnTriggered();
+				}
+			}
+		}
+
+		public void NotTriggeredBySource (LOSEventSource source) {
+			if (_triggerSources.Contains(source)) {
+				_triggerSources.Remove(source);
+
+				if (OnNotTriggeredBySource != null) {
+					OnNotTriggeredBySource(source);
+				}
+				if (_triggerSources.Count == 0 && OnNotTriggered != null) {
+					OnNotTriggered();
 				}
 			}
 		}
 
 		public void NotTriggered () {
-			if (_triggered) {
-				_triggered = false;
+			_triggerSources.Clear();
 
-				if (OnNotTriggered != null) {
-					OnNotTriggered();
-				}
+			if (OnNotTriggered != null) {
+				OnNotTriggered();
 			}
 		}
 	}

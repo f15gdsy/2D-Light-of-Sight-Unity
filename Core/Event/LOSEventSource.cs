@@ -47,7 +47,7 @@ namespace LOS.Event {
 
 					if (Physics.Raycast(_trans.position, direction, out hit, distance, mask)) {
 						GameObject hitGo = hit.collider.gameObject;
-						Debug.Log(hitGo.name);
+
 						if (hitGo == trigger.gameObject) {
 							triggered = true;
 						}
@@ -62,7 +62,6 @@ namespace LOS.Event {
 				}
 
 				if (triggered) {
-					Debug.Log("Add");
 					triggeredTriggers.Add(trigger);
 				}
 				else {
@@ -72,10 +71,11 @@ namespace LOS.Event {
 			}
 
 			foreach (LOSEventTrigger trigger in triggeredTriggers) {
-				trigger.TriggeredByLight(this);
+				trigger.TriggeredBySource(this);
 			}
+
 			foreach (LOSEventTrigger trigger in notTriggeredTriggers) {
-				trigger.NotTriggered();
+				trigger.NotTriggeredBySource(this);
 			}
 		}
 	}
