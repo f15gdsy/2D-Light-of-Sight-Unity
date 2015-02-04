@@ -2,22 +2,17 @@
 <br>
 
 ## What is it?
-A 2D light of sight library for Unity3d, that is, it achieves something like [this] (https://dl.dropboxusercontent.com/u/27907965/images/los_0.png).
+A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [this] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/los_radial_light_0.png) and [this] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/los_full_screen_light_0.png).
 
 #### Features
 1. Can cope with any shape, as long as the corresponding collider is attached with the object.
-2. Has [normal shadow mode] (https://dl.dropboxusercontent.com/u/27907965/images/los_2.png), and [invert shadow mode] (https://dl.dropboxusercontent.com/u/27907965/images/los_1.png).
-Usually invert mode is what we want, but with normal shadow mode you may be able to draw something on the shadow with RenderTexture (requires a pro liscence which I dont have).
+2. Has [radial shadow mode] (https://dl.dropboxusercontent.com/u/27907965/images/los_2.png), and [fullscreen shadow mode] (https://dl.dropboxusercontent.com/u/27907965/images/los_1.png).
+3. Event system. Objects can be notified if it gets lit or gets unlit.
+4. All features are supported by Unity #FREE# version!!!
 
 <br><br>
 
-## How to use?
-
-#### 1. Create something like the invert shadow mode.
-1. Attach LOSLight.cs to the object which will be the light source
-2. Tick the invert box, and select obstacle layer.
-3. Attach LOSObstacle to the object which will be an obstacle.
-4. Set the obstacle object's layer to the corresponding layer set in step 2.
-
-And it should work!
+## Demo
+1. [Radial Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/RadialLightDemo/RadialLightDemo.html)
+2. [Fullscreen Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/FullScreenLightDemo/FullScreenLightDemo.html)
 
