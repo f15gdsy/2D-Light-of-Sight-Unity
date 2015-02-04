@@ -1,4 +1,4 @@
-# 2D-Light-of-Sight-Unity
+# 2D-Light-of-Sight-Unity v0.9 alpha
 <br>
 
 ## What is it?
