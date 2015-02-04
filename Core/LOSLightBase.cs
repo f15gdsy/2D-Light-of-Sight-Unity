@@ -24,7 +24,7 @@ namespace LOS {
 
 		// Light Settings
 		[Tooltip("The precision of the light collision test. Measured in degrees.")]
-		public float degreeStep = 1f;
+		public float degreeStep = 0.2f;
 
 		[Tooltip("Draws the light in invert mode or not.")]
 		public bool invertMode = false;
