@@ -218,7 +218,7 @@ namespace LOS {
 			if (degreeA == 360) {
 				degreeA = 0;
 			}
-			if (degreeA > degreeB + 0.001f || (degreeA > degreeB && degreeA < degreeB + 0.001f && give4CornersWhenAEqualB)) {	// 0.001f is the tolerance
+			if (degreeA > degreeB + 0.0005f || (degreeA > degreeB && degreeA < degreeB + 0.0005f && give4CornersWhenAEqualB)) {	// 0.001f is the tolerance
 				degreeA -= 360;
 			}
 					

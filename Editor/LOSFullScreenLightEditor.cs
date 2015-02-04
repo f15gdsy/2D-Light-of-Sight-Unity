@@ -16,6 +16,15 @@ namespace LOS.Editor {
 		}
 
 		public override void OnInspectorGUI () {
+			var light = (LOSFullScreenLight) target;
+
+			if (!SHelper.CheckWithinScreen(light.position, LOSManager.instance.losCamera.unityCamera, 0)) {
+				EditorGUILayout.HelpBox(
+					"Full Screen Light requires its position within the camera. " +
+					"Otherwise, wired shadow will be present. I'm working on the next version to better solve the issue.", 
+					MessageType.Warning);
+			}
+
 			base.OnInspectorGUI();
 
 			EditorGUILayout.PropertyField(_invertMode);

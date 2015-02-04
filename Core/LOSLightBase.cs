@@ -93,7 +93,7 @@ namespace LOS {
 			UpdateSortingLayer();
 			renderer.material = material;
 
-			DoDraw();
+			TryDraw();
 		}
 
 		public void TryDraw () {

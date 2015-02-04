@@ -11,6 +11,8 @@ public class Follow : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		_trans = transform;
+
+		LateUpdate();
 	}
 	
 	// Update is called once per frame

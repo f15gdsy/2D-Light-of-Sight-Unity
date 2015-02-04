@@ -30,42 +30,51 @@ namespace LOS.Event {
 		public void Process (List<LOSEventTrigger> triggers) {
 			RaycastHit hit;
 
-			List<LOSEventTrigger> triggered = new List<LOSEventTrigger>();
-			List<LOSEventTrigger> notTriggered = new List<LOSEventTrigger>();
-
-			LayerMask mask = triggerLayers | obstacleLayers;
+			List<LOSEventTrigger> triggeredTriggers = new List<LOSEventTrigger>();
+			List<LOSEventTrigger> notTriggeredTriggers = new List<LOSEventTrigger>();
 
 			foreach (LOSEventTrigger trigger in triggers) {
+
+				if (!SHelper.CheckGameObjectInLayer(trigger.gameObject, triggerLayers)) continue;
+
+				bool triggered = false;
 				Vector3 direction = trigger.position - _trans.position;
 
-				if (direction.sqrMagnitude <= distance) {	// Within distance
-					if (triggered.Contains(trigger)) continue;		// May be added previously
+				if (direction.sqrMagnitude <= distance * distance) {	// Within distance
+					if (triggeredTriggers.Contains(trigger)) continue;		// May be added previously
+
+					LayerMask mask = 1 << trigger.gameObject.layer | obstacleLayers;
 
 					if (Physics.Raycast(_trans.position, direction, out hit, distance, mask)) {
 						GameObject hitGo = hit.collider.gameObject;
-
+						Debug.Log(hitGo.name);
 						if (hitGo == trigger.gameObject) {
-							triggered.Add(trigger);
+							triggered = true;
 						}
-						else {
-							notTriggered.Add(trigger);
-
-							if (SHelper.CheckGameObjectInLayer(hitGo, triggerLayers)) {
-								LOSEventTrigger triggerToAdd = hitGo.GetComponentInChildren<LOSEventTrigger>();
-								if (triggerToAdd == null) {
-									triggerToAdd = hitGo.GetComponentInParent<LOSEventTrigger>();
-								}
-								triggered.Add(triggerToAdd);
+						else if (hitGo.layer == trigger.gameObject.layer) {
+							LOSEventTrigger triggerToAdd = hitGo.GetComponentInChildren<LOSEventTrigger>();
+							if (triggerToAdd == null) {
+								triggerToAdd = hitGo.GetComponentInParent<LOSEventTrigger>();
 							}
+							triggeredTriggers.Add(triggerToAdd);
 						}
 					}
 				}
+
+				if (triggered) {
+					Debug.Log("Add");
+					triggeredTriggers.Add(trigger);
+				}
+				else {
+					notTriggeredTriggers.Add(trigger);
+				}
+
 			}
 
-			foreach (LOSEventTrigger trigger in triggered) {
+			foreach (LOSEventTrigger trigger in triggeredTriggers) {
 				trigger.TriggeredByLight(this);
 			}
-			foreach (LOSEventTrigger trigger in notTriggered) {
+			foreach (LOSEventTrigger trigger in notTriggeredTriggers) {
 				trigger.NotTriggered();
 			}
 		}
