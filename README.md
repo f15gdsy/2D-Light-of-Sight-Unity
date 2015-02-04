@@ -15,10 +15,10 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 1. Set camera. Place LOSCamera script on the camera that is used to render the shadow. (Or ignore this step if you only have one camera, the editor will do the work for you.)
 2. Create a light. In the GameObject dropdown, select LOS 2D Lighting / Radial Light (or other lights) to create a 2D light gameobject. For the 2D light to work properly, the obstacle layer property should be set in the inspector. 
 3. Create an obstacle. Create any premitive or sprites, and attach Unity collider to them. Then attach LOSObstacle script to the gameobject. Also don't forget to set its layer to match what's set in step 2.
-4. That's it!
+4. Adjust degree step to match the precision you want.
 
 #### Tips:
-1. Sometimes for moving lights, the degree step (which stands for precision) should be set lower, something like 0.1f or 0.2f would be good enough.
+1. Sometimes for moving lights, the degree step (which stands for precision) should be set lower, something like 0.1f or 0.2f would be good enough. However, the smaller the degree step (better precision), usually means more costly. I'm planning to work on better scene management to improve this.
 2. The Full Screen Light requires its position is within the camera so that to work properly.
 3. Currently it only supports 3D colliders, however, I'm planing to make it work on 2D colliders too. It should not be too difficult.
 
