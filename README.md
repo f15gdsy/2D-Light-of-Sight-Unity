@@ -1,8 +1,8 @@
-# 2D-Line-of-Sight-Unity
+# 2D-Light-of-Sight-Unity
 <br>
 
 ## What is it?
-A 2D line of sight library for Unity3d, that is, it achieves something like [this] (https://dl.dropboxusercontent.com/u/27907965/images/los_0.png).
+A 2D light of sight library for Unity3d, that is, it achieves something like [this] (https://dl.dropboxusercontent.com/u/27907965/images/los_0.png).
 
 #### Features
 1. Can cope with any shape, as long as the corresponding collider is attached with the object.
