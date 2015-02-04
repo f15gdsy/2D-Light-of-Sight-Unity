@@ -4,8 +4,14 @@ using System.Collections.Generic;
 
 namespace LOS {
 
+	/// <summary>
+	/// LOSObstacles provides mechanism for the system to tell if the system is changed.
+	/// </summary>
 	public class LOSObstacle : LOSObjectBase {
 
+		[Tooltip("If the obstacle's center is offscreen, how much distance from the screen edge should be enough for the system" +
+			"to consider it is fully offscreen?")]
+		public float offScreenDistance = 3;
 		public virtual List<Vector2> vertices {get; set;}
 		private LayerMask _previousLayerMask;
 
@@ -27,7 +33,7 @@ namespace LOS {
 		}
 
 		public override bool CheckDirty () {
-			return base.CheckDirty () || gameObject.layer != _previousLayerMask;
+			return SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.unityCamera, offScreenDistance) && (base.CheckDirty () || gameObject.layer != _previousLayerMask);
 		}
 
 		public override void UpdatePreviousInfo () {

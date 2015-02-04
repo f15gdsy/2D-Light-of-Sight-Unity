@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace LOS {
 
+
+	/// <summary>
+	/// Draws full screen light.
+	/// </summary>
 	public class LOSFullScreenLight : LOSLightBase {
 
 		private float _tolerance;

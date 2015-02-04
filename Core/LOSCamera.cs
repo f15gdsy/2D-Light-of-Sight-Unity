@@ -3,6 +3,10 @@ using System.Collections;
 
 namespace LOS {
 
+	/// <summary>
+	/// LOS camera. 
+	/// Needs to be placed in a camera for the system to work.
+	/// </summary>
 	[RequireComponent (typeof(Camera))]
 	public class LOSCamera : LOSObjectBase {
 		private Camera _camera;

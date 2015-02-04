@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace LOS {
-	
+
+	/// <summary>
+	/// Draws radial light.
+	/// </summary>
 	public class LOSRadialLight : LOSLightBase {
 
 		// Radius

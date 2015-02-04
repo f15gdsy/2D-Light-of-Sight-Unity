@@ -55,14 +55,19 @@ namespace LOS.Editor {
 
 		private static bool CheckLOSCameraExistence () {
 			var losCameras = GameObject.FindObjectsOfType<LOSCamera>();
+
+			bool result = losCameras.Length == 1;
+
 			if (losCameras.Length == 0) {
-				Debug.LogWarning("No LOSCamera is found in the scene! Please remember to attach LOSCamera to the camera gameobjeect.");
+				Debug.LogWarning("No LOSCamera found! We'll add the LOSCamera in the Camera.main. Change it if you need to.");
+				Camera.main.gameObject.AddComponent<LOSCamera>();
+				result = true;
 			}
 			else if (losCameras.Length > 1) {
 				Debug.LogWarning("More than 1 LOSCamera are found in the scene! Please only keep one active.");
 			}
 
-			return losCameras.Length == 1;
+			return result;
 		}
 
 		private static void PlaceGameObjectAccordingToCamera (GameObject go) {

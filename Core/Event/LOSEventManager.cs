@@ -16,10 +16,10 @@ namespace LOS.Event {
 		private List<LOSEventTrigger> _triggers;
 
 
-		// Split workload to serveral frames
+		// TODO: Split workload to serveral frames
 		private bool _isProcessing;
-		private int _maxFrames = 10;
-		private int _currentLightIndex = 0;
+//		private int _maxFrames = 10;
+//		private int _currentLightIndex = 0;
 
 
 
@@ -87,7 +87,7 @@ namespace LOS.Event {
 		}
 
 		private void ResetSettings () {
-			_currentLightIndex = 0;
+//			_currentLightIndex = 0;
 		}
 
 		public void AddEventSource (LOSEventSource source) {

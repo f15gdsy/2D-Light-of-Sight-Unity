@@ -89,12 +89,13 @@ namespace LOS {
 				gameObject.AddComponent<MeshRenderer>();
 			}
 
-			UpdateRenderQueue();
+			UpdateSortingOrder();
 			UpdateSortingLayer();
 			renderer.material = material;
 
 			TryDraw();
 		}
+
 
 		public void TryDraw () {
 			if (LOSManager.instance.CheckDirty() || CheckDirty()) {
@@ -108,7 +109,7 @@ namespace LOS {
 				UpdateSortingLayer();
 			}
 			if (CheckRenderQueueDirty()) {
-				UpdateRenderQueue();
+				UpdateSortingOrder();
 			}
 		}
 
@@ -118,7 +119,6 @@ namespace LOS {
 		protected virtual void InvertDraw () {}
 		
 		protected virtual float GetMaxLightLength () {return 0;}
-
 
 
 		public override void UpdatePreviousInfo () {
@@ -284,9 +284,8 @@ namespace LOS {
 			_previousSortingLayer = sortingLayer;
 		}
 
-		protected void UpdateRenderQueue () {
+		protected void UpdateSortingOrder () {
 			renderer.sortingOrder = orderInLayer;
-//			material.renderQueue = orderInLayer + 3000;		// 3000 is Transparent's render queue
 			_previousOrderInLayer = orderInLayer;
 		}
 

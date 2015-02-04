@@ -1,6 +1,6 @@
 ﻿Shader "LOS/Radial Light" {
 	Properties {
-		_MainTex ("Base (RGB)", 2D) = "white" {}
+		_MainTex ("Base (RGB)", 2D) = "radial" {}
 	}
 	SubShader {
         Tags {

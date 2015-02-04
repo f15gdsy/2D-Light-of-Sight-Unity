@@ -2,7 +2,10 @@
 using System.Collections;
 
 namespace LOS {
-	
+
+	/// <summary>
+	/// Base class for the system's objects, like light, obstacle, and camera.
+	/// </summary>
 	[ExecuteInEditMode]
 	public abstract class LOSObjectBase : MonoBehaviour {
 

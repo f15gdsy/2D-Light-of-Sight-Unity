@@ -19,8 +19,7 @@ namespace LOS.Event {
 		public event HandleSourceDelegate OnNotTriggeredBySource;
 		public event HandleNoSourceDelegate OnTriggered;
 		public event HandleNoSourceDelegate OnNotTriggered;
-		private bool _triggered;
-		public bool triggered {get {return _triggered;}}
+		public bool triggered {get {return _triggerSources.Count > 0;}}
 
 		private List<LOSEventSource> _triggerSources;
 
