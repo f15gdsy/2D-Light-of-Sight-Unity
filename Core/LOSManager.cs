@@ -150,6 +150,10 @@ namespace LOS {
 		/// It is the place tells the lights to draw.
 		/// </summary>
 		public void UpdateLights () {
+			if (losCamera.CheckDirty()) {
+				UpdateViewingBox();
+			}
+
 			foreach (var light in lights) {
 				light.TryDraw();
 			}
@@ -166,7 +170,7 @@ namespace LOS {
 				obstacle.UpdatePreviousInfo();
 			}
 			
-			UpdateViewingBox();
+//			UpdateViewingBox();
 		}
 
 		private void Init () {
