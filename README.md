@@ -29,3 +29,8 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 1. [Radial Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/RadialLightDemo/RadialLightDemo.html)
 2. [Fullscreen Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/FullScreenLightDemo/FullScreenLightDemo.html)
 
+
+## Remarks
+Feel free to use it! It's under MIT liscence!
+Just a reference back to here will be very appreciated :D
+Also any comments, questions, and suggestions are welcome!
