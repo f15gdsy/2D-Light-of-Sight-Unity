@@ -1,4 +1,4 @@
-# 2D Light of Sight Unity (v0.9 alpha)
+# 2D Light of Sight (v0.9 alpha)
 <br>
 
 ###
