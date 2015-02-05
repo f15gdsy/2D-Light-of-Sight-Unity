@@ -2,6 +2,13 @@
 <br>
 
 ###
+
+## Demo
+1. [Radial Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/RadialLightDemo/RadialLightDemo.html)
+2. [Fullscreen Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/FullScreenLightDemo/FullScreenLightDemo.html)
+
+<br>
+
 ## What is it?
 A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [this] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/los_radial_light_0.png) and [this] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/los_full_screen_light_0.png).
 
@@ -24,11 +31,6 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 
 
 <br>
-
-## Demo
-1. [Radial Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/RadialLightDemo/RadialLightDemo.html)
-2. [Fullscreen Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/FullScreenLightDemo/FullScreenLightDemo.html)
-
 
 ## Remarks
 Feel free to use it! It's under MIT liscence!
