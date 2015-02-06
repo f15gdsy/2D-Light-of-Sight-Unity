@@ -36,3 +36,4 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 Feel free to use it! It's under MIT liscence!
 Just a reference back to here will be very appreciated :D
 Also any comments, questions, and suggestions are welcome!
+Unity forum: http://forum.unity3d.com/threads/light-of-sight-2d-dynamic-lighting-open-source.295968/
