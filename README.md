@@ -32,6 +32,11 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 
 <br>
 
+## TODO in the next version
+1. Add APIs for toggling the lighting & event system on off.
+
+<br>
+
 ## Remarks
 Feel free to use it! It's under MIT liscence!
 Just a reference back to here will be very appreciated :D
