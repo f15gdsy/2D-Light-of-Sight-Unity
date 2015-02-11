@@ -49,6 +49,7 @@ namespace LOS {
 		// Cache
 		protected Mesh _mesh;
 		protected LayerMask _previousObstacleLayer;
+		private Renderer _renderer;
 		protected bool _previousInvertMode;
 		protected float _previousDegreeStep;
 
@@ -75,23 +76,28 @@ namespace LOS {
 
 		protected virtual void OnEnable () {
 			LOSManager.instance.AddLight(this);
+			_renderer.enabled = true;
 		}
 
 		protected virtual void OnDisable () {
 			if (LOSManager.TryGetInstance() != null) {
 				LOSManager.instance.RemoveLight(this);
 			}
+			_renderer.enabled = false;
 		}
 
 
 		void Start () {
 			if (renderer == null) {
-				gameObject.AddComponent<MeshRenderer>();
+				_renderer = gameObject.AddComponent<MeshRenderer>();
+			}
+			else {
+				_renderer = renderer;
 			}
 
 			UpdateSortingOrder();
 			UpdateSortingLayer();
-			renderer.material = material;
+			_renderer.material = material;
 
 			TryDraw();
 		}
@@ -280,12 +286,12 @@ namespace LOS {
 		}
 
 		protected void UpdateSortingLayer () {
-			renderer.sortingLayerID = sortingLayer;
+			_renderer.sortingLayerID = sortingLayer;
 			_previousSortingLayer = sortingLayer;
 		}
 
 		protected void UpdateSortingOrder () {
-			renderer.sortingOrder = orderInLayer;
+			_renderer.sortingOrder = orderInLayer;
 			_previousOrderInLayer = orderInLayer;
 		}
 

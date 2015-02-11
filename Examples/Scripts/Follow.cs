@@ -7,13 +7,11 @@ public class Follow : MonoBehaviour {
 	public bool freezeZ;
 
 	private Transform _trans;
-	private bool _firstTime;
+
 
 	// Use this for initialization
 	void Start () {
 		_trans = transform;
-
-		_firstTime = true;
 	}
 
 	// Update is called once per frame

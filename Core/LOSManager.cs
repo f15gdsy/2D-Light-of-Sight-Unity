@@ -145,6 +145,14 @@ namespace LOS {
 			UpdateLights();
 		}
 
+		void OnEnable () {
+			
+		}
+
+		void OnDisable () {
+
+		}
+
 		/// <summary>
 		/// Updates the lights. 
 		/// It is the place tells the lights to draw.
