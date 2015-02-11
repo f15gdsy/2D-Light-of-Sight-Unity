@@ -211,6 +211,11 @@ public static class SMath {
 		}
 	}
 
+	/// <summary>
+	/// Vectors to degree.
+	/// </summary>
+	/// <returns>The degree from 0 to 360.</returns>
+	/// <param name="v">V.</param>
 	public static float VectorToDegree (Vector2 v) {
 		float radian = Mathf.Atan2(v.y, v.x);
 		float degree = radian * Mathf.Rad2Deg;
