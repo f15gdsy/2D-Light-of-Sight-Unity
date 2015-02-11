@@ -13,7 +13,7 @@
             Tags {
                 "LightMode"="Always"
             }
-            Blend SrcAlpha One
+            Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
             
             Fog {Mode Off}
