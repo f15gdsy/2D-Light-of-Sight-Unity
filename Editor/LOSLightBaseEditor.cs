@@ -22,7 +22,7 @@ namespace LOS.Editor {
 
 			var light = (LOSLightBase) target;
 
-			EditorUtility.SetSelectedWireframeHidden(light.renderer, true);
+			EditorUtility.SetSelectedWireframeHidden(light.renderer, !LOSManager.instance.debugMode);
 
 			_isStatic = serializedObject.FindProperty("isStatic");
 			_obstacleLayer = serializedObject.FindProperty("obstacleLayer");

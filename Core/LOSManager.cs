@@ -11,6 +11,7 @@ namespace LOS {
 	[ExecuteInEditMode]
 	public class LOSManager : MonoBehaviour {
 		public float viewboxExtension = 1.01f;
+		public bool debugMode;
 //		public float collidersExtension = 1.001f;
 
 		[HideInInspector]
