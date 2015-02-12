@@ -49,7 +49,6 @@ namespace LOS {
 		// Cache
 		protected Mesh _mesh;
 		protected LayerMask _previousObstacleLayer;
-		private Renderer _renderer;
 		protected bool _previousInvertMode;
 		protected float _previousDegreeStep;
 
@@ -59,6 +58,7 @@ namespace LOS {
 			base.Awake();
 
 			coneAngle = SMath.ClampDegree0To360(coneAngle);
+			faceAngle = SMath.ClampDegree0To360(faceAngle);
 
 			var meshFilter = GetComponent<MeshFilter>();
 			if (meshFilter == null) {
@@ -76,28 +76,29 @@ namespace LOS {
 
 		protected virtual void OnEnable () {
 			LOSManager.instance.AddLight(this);
-			_renderer.enabled = true;
+			if (renderer != null) {
+				renderer.enabled = true;
+			}
 		}
 
 		protected virtual void OnDisable () {
 			if (LOSManager.TryGetInstance() != null) {
 				LOSManager.instance.RemoveLight(this);
 			}
-			_renderer.enabled = false;
+			if (renderer != null) {
+				renderer.enabled = false;
+			}
 		}
 
 
 		void Start () {
 			if (renderer == null) {
-				_renderer = gameObject.AddComponent<MeshRenderer>();
-			}
-			else {
-				_renderer = renderer;
+				gameObject.AddComponent<MeshRenderer>();
 			}
 
 			UpdateSortingOrder();
 			UpdateSortingLayer();
-			_renderer.material = material;
+			renderer.material = material;
 
 			TryDraw();
 		}
@@ -119,6 +120,25 @@ namespace LOS {
 			}
 		}
 
+		/// <summary>
+		/// Checks the a particular degree is within cone area or not.
+		/// </summary>
+		/// <returns><c>true</c>, if degree is within cone areac>false</c> otherwise.</returns>
+		/// <param name="degree">Degree.</param>
+		public bool CheckDegreeWithinCone (float degree) {
+			if (coneAngle == 0) return true;
+
+			float min = faceAngle - coneAngle / 2;
+			float max = faceAngle + coneAngle / 2;
+
+			if (degree > max) {return false;}
+
+			if (min < 0) {
+				min = SMath.ClampDegree0To360(min);
+			}
+			return degree > min;
+		}
+
 
 		protected virtual void ForwardDraw () {}
 		
@@ -130,8 +150,8 @@ namespace LOS {
 		public override void UpdatePreviousInfo () {
 			base.UpdatePreviousInfo ();
 
-			_previousFaceAngle = faceAngle;
-			_previousLightAngle = coneAngle;
+			_previousFaceAngle = SMath.ClampDegree0To360(faceAngle);
+			_previousLightAngle = SMath.ClampDegree0To360(coneAngle);
 			_previousColor = color;
 			_previousObstacleLayer = obstacleLayer;
 			_previousInvertMode = invertMode;
@@ -286,12 +306,12 @@ namespace LOS {
 		}
 
 		protected void UpdateSortingLayer () {
-			_renderer.sortingLayerID = sortingLayer;
+			renderer.sortingLayerID = sortingLayer;
 			_previousSortingLayer = sortingLayer;
 		}
 
 		protected void UpdateSortingOrder () {
-			_renderer.sortingOrder = orderInLayer;
+			renderer.sortingOrder = orderInLayer;
 			_previousOrderInLayer = orderInLayer;
 		}
 

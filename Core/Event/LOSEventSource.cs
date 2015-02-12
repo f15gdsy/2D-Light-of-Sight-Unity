@@ -8,6 +8,8 @@ namespace LOS.Event {
 
 		private Transform _trans;
 
+		[Tooltip ("Related light. Can be null if the event source is not a light.")]
+		public LOSLightBase lightSource;
 		public LayerMask triggerLayers;
 		public LayerMask obstacleLayers;
 		public float distance;
@@ -38,7 +40,15 @@ namespace LOS.Event {
 				if (!SHelper.CheckGameObjectInLayer(trigger.gameObject, triggerLayers)) continue;
 
 				bool triggered = false;
+
 				Vector3 direction = trigger.position - _trans.position;
+				float degree = SMath.VectorToDegree(direction);
+				if (lightSource != null) {
+					if (!lightSource.CheckDegreeWithinCone(degree)) {
+						notTriggeredTriggers.Add(trigger);
+						continue;
+					}
+				}
 
 				if (direction.sqrMagnitude <= distance * distance) {	// Within distance
 					if (triggeredTriggers.Contains(trigger)) continue;		// May be added previously
