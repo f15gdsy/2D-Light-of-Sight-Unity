@@ -189,7 +189,7 @@ namespace LOS {
 		}
 
 		private void UpdateViewingBox () {
-			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
+			Vector2 screenSize = SHelper.GetScreenSizeInWorld(0);
 			halfViewboxSize = screenSize / 2 * viewboxExtension;
 
 			Vector2 upperRight = new Vector2(halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(losCameraTrans.position);

@@ -63,9 +63,18 @@ public static class SHelper {
 		trans.localEulerAngles = angle;
 	}
 
-	public static Vector2 GetScreenSizeInWorld () {
-		float height = Camera.main.orthographicSize;
-		float width = height * Camera.main.aspect;
+	public static Vector2 GetScreenSizeInWorld (float depth) {
+		float height;
+		float width;
+		Camera cam = Camera.main;
+
+		if (Camera.main.isOrthoGraphic) {
+			height = cam.orthographicSize;
+		}
+		else {
+			height = Mathf.Tan(0.5f * cam.fieldOfView * Mathf.Deg2Rad) * Mathf.Abs(cam.transform.position.z - depth);
+		}
+		width = height * Camera.main.aspect;
 		return new Vector2(2 * width, 2 * height);
 	}
 

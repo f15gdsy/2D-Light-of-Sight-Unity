@@ -70,7 +70,7 @@ namespace LOS {
 				meshFilter.mesh = _mesh;
 			}
 			
-			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
+			Vector2 screenSize = SHelper.GetScreenSizeInWorld(position.z);
 			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
 		}
 
@@ -263,7 +263,7 @@ namespace LOS {
 		}
 
 		protected float GetMinRaycastDistance () {
-			Vector3 screenSize = SHelper.GetScreenSizeInWorld();
+			Vector3 screenSize = SHelper.GetScreenSizeInWorld(position.z);
 			return screenSize.magnitude;
 		}
 
