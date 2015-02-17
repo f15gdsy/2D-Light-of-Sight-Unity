@@ -1,4 +1,4 @@
-# 2D Light of Sight (v0.9 alpha)
+# 2D Light of Sight (v0.91 alpha)
 <br>
 
 ###
@@ -34,8 +34,6 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 
 ## TODO in the next version
 1. Add APIs for toggling the lighting & event system on off.
-2. Event source in cone shape
-3. Add in a multiply shader that works with a shadow mask to create the effect of invert mode.
 
 <br>
 
