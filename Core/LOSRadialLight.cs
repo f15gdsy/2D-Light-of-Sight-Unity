@@ -81,9 +81,9 @@ namespace LOS {
 			bool raycastHitAtStartAngle = false;
 			Vector3 direction = Vector3.zero;
 			Vector3 previousNormal = Vector3.zero;
-			Collider previousCollider = null;
+			Collider2D previousCollider = null;
 			float distance = _radius;
-			RaycastHit hit;
+			RaycastHit2D tHit;
 			int currentVertexIndex = -1;
 			int previousVectexIndex = -1;
 			Vector3 previousTempPoint = Vector3.zero;
@@ -92,11 +92,14 @@ namespace LOS {
 			
 			for (float degree=_startAngle; degree<_endAngle; degree+=degreeStep) {
 				direction = SMath.DegreeToUnitVector(degree);
-				
-				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit)) {
-					Vector3 hitPoint = hit.point;
-					Collider hitCollider = hit.collider;
-					Vector3 hitNormal = hit.normal;
+
+                tHit = Physics2D.Raycast(position, direction, distance, obstacleLayer);
+
+                if (tHit && CheckRaycastHit(tHit))
+                {
+					Vector3 hitPoint = tHit.point;
+					Collider2D hitCollider = tHit.collider;
+					Vector3 hitNormal = tHit.normal;
 					
 					if (degree == _startAngle) {
 						raycastHitAtStartAngle = true;
@@ -105,7 +108,7 @@ namespace LOS {
 						currentVertexIndex = meshVertices.Count - 1;
 						
 					}
-					else if (previousCollider != hit.collider) {
+					else if (previousCollider != tHit.collider) {
 						if (previousCollider == null) {
 							meshVertices.Add(hitPoint - position);
 							previousVectexIndex = currentVertexIndex;
