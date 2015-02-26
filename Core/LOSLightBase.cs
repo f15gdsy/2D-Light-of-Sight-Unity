@@ -290,7 +290,7 @@ namespace LOS {
 			}
 		}
 
-		protected bool CheckRaycastHit (RaycastHit hit) {
+		protected bool CheckRaycastHit (RaycastHit2D hit) {
 			Vector3 hitPoint = hit.point;
 			return LOSManager.instance.CheckPointWithinViewingBox(hitPoint);
 		}
