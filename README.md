@@ -24,7 +24,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 3. Create an obstacle. Create any premitive or sprites, and attach Unity collider to them. Then attach LOSObstacle script to the gameobject. Also don't forget to set its layer to match what's set in step 2.
 4. Adjust degree step to match the precision you want.
 
-#### Tips:
+#### Tips & Tricks:
 1. Sometimes for moving lights, the degree step (which stands for precision) should be set lower, something like 0.1f or 0.2f would be good enough. However, the smaller the degree step (better precision), usually means more costly. I'm planning to work on better scene management to improve this.
 2. The Full Screen Light requires its position is within the camera so that to work properly.
 3. Currently it only supports 3D colliders, however, I'm planing to make it work on 2D colliders too. It should not be too difficult.
@@ -35,6 +35,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 ## TODO in the next version
 1. Add APIs for toggling the lighting & event system on off.
 2. Let the user choose LOSLightBase's Camera, useful when using perspective camera for invert full screen light & using orthographic camera for radial lights.
+3. Add suport for 2D colliders.
 
 <br>
 
