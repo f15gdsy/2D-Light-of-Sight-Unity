@@ -34,6 +34,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 
 ## TODO in the next version
 1. Add APIs for toggling the lighting & event system on off.
+2. Let the user choose LOSLightBase's Camera, useful when using perspective camera for invert full screen light & using orthographic camera for radial lights.
 
 <br>
 
