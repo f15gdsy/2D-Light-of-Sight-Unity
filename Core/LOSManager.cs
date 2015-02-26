@@ -23,8 +23,6 @@ namespace LOS {
 		private List<LOSLightBase> _lights;
 		private Transform _losCameraTrans;
 		private LOSCamera _losCamera;
-		private Transform _losSecondCameraTrans;
-		private LOSCamera _losSecondCamera;
 		private bool _isDirty;
 
 
@@ -109,25 +107,9 @@ namespace LOS {
 					}
 					else if (losCameras.Length == 1) {
 						_losCamera = losCameras[0];
-						_losCamera.mainLOSCamera = true;
 					}
-					else if (losCameras.Length == 2) {
-						foreach (LOSCamera cam in losCameras) {
-							if (cam.mainLOSCamera) {
-								if (_losCamera == null) {
-									_losCamera = cam;
-								}
-								else {
-									Debug.LogError("More than 1 MAIN LOSCamera found!");
-								}
-							}
-						}
-						if (_losCamera == null) {
-							Debug.LogError("No MAIN LOSCamera found!");
-						}
-					}
-					else if (losCameras.Length > 2) {
-						Debug.LogError("More than 2 LOSCamera found!");
+					else if (losCameras.Length > 1) {
+						Debug.LogError("More than 1 LOSCamera found!");
 					}
 				}
 				return _losCamera;
@@ -142,44 +124,6 @@ namespace LOS {
 			}
 		}
 
-		public LOSCamera losSecondCamera {
-			get {
-				if (_losSecondCamera == null) {
-					var losCameras = FindObjectsOfType<LOSCamera>();
-					if (losCameras.Length == 0) {
-						Debug.LogError("No LOSCamera is found in the scene! Please remember to attach LOSCamera to the camera gameobjeect.");
-					}
-					else if (losCameras.Length == 2) {
-						foreach (LOSCamera cam in losCameras) {
-							if (!cam.mainLOSCamera) {
-								if (_losSecondCamera == null) {
-									_losSecondCamera = cam;
-								}
-								else {
-									Debug.LogError("More than 1 second LOSCamera found!");
-								}
-							}
-						}
-						if (_losSecondCamera == null) {
-							Debug.LogError("No second LOSCamera found!");
-						}
-					}
-					else if (losCameras.Length > 2) {
-						Debug.LogError("More than 2 LOSCamera found!");
-					}
-				}
-				return _losSecondCamera;
-			}
-		}
-		public Transform losSecondCameraTrans {
-			get {
-				if (_losSecondCameraTrans == null) {
-					_losSecondCameraTrans = losSecondCamera.transform;
-				}
-				return _losSecondCameraTrans;
-			}
-		}
-		public bool hasSecondCamera {get {return _losSecondCamera != null;}}
 
 		void Start () {
 			Init();
@@ -217,8 +161,7 @@ namespace LOS {
 			_isDirty = false;
 			
 			losCamera.UpdatePreviousInfo();
-			if (hasSecondCamera) losSecondCamera.UpdatePreviousInfo();
-			
+
 			foreach (LOSObstacle obstacle in obstacles) {
 				obstacle.UpdatePreviousInfo();
 			}
@@ -285,88 +228,7 @@ namespace LOS {
 			return new Vector3(x, y, 0);
 		}
 		
-		public Vector3 GetCollisionPointWithViewBox (Vector3 origin, Vector3 direction) {
-			Vector3 point = Vector3.zero;
-			foreach (var line in viewbox) {
-				Vector2 q = line.start;
-				Vector2 s = line.end - line.start;
-				
-				Vector2 p = SMath.Vec3ToVec2(origin);
-				Vector2 r = SMath.Vec3ToVec2(direction);
-				
-				// The intersection is where q + u*s == p + t*r, and 0 <= u <= 1 && 0 <= t
-				// t = (q − p) × s / (r × s)
-				// u = (q − p) × r / (r × s)
-				
-				float crossRS = SMath.CrossProduct2D(r, s);
-				float crossQP_S = SMath.CrossProduct2D(q - p, s);
-				float crossQP_R = SMath.CrossProduct2D(q - p, r);
-				
-				if (crossRS == 0) {
-					// TODO: other situations
-				}
-				else {
-					float t = crossQP_S / crossRS;
-					float u = crossQP_R / crossRS;
-					
-					if (0 <= u && u <= 1 && 0 <= t) {
-						point = q + u * s;
-						break;
-					}
-				}
-			}
-			return point;
-		}
-		
-		// Works in counter-clock wise, pointA is the one with smaller angle against vector (1, 0)
-		public List<Vector3> GetViewboxCornersBetweenPoints (Vector3 pointA, Vector3 pointB, Vector3 origin, bool give4CornersWhenAEqualB) {
-			pointA.z = 0;
-			pointB.z = 0;
-			origin.z = 0;
-			
-			float degreeA = SMath.VectorToDegree(pointA - origin);
-			float degreeB = SMath.VectorToDegree(pointB - origin);
-			
-			if (degreeA == 360) {
-				degreeA = 0;
-			}
-			if (degreeA > degreeB + 0.0005f || (degreeA >= degreeB && degreeA <= degreeB + 0.0005f && give4CornersWhenAEqualB)) {	// 0.0005f is the tolerance
-				degreeA -= 360;
-			}
-			
-			Dictionary<float, Vector3> tempResults = new Dictionary<float, Vector3>();
-			
-			foreach (var line in viewbox) {
-				Vector3 corner = line.end;
-				
-				float degreeToA = 0;
-				float degreeCorner = SMath.VectorToDegree(corner - origin);
-				if (((degreeToA = (degreeCorner - degreeA)) > 0 && degreeCorner < degreeB) ||
-				    ((degreeToA = (degreeCorner - 360 - degreeA)) > 0 && degreeCorner - 360 < degreeB) ||
-				    ((degreeToA = (degreeCorner + 360 - degreeA)) > 0 && degreeCorner + 360 < degreeB)) {
-					tempResults.Add(degreeToA, corner);
-				}
-			}
-			
-			List<float> degreesToA = new List<float>();
-			
-			foreach (float degreeToA in tempResults.Keys) {
-				degreesToA.Add(degreeToA);
-			}
-			degreesToA.Sort();
-			
-			List<Vector3> results = new List<Vector3>();
-			foreach (float degreeToA in degreesToA) {
-				results.Add(tempResults[degreeToA]);
-			}
-			
-			return results;
-		}
 
-		public bool CheckPointWithinViewingBox (Vector2 point) {
-			return !(point.x <= -halfViewboxSize.x + losCameraTrans.position.x || point.x >= halfViewboxSize.x + losCameraTrans.position.x ||
-			         point.y <= -halfViewboxSize.y + losCameraTrans.position.y || point.y >= halfViewboxSize.y + losCameraTrans.position.y);
-		}
 
 		// ------------End------------
 

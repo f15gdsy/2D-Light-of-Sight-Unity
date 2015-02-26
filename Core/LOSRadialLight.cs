@@ -57,7 +57,7 @@ namespace LOS {
 		}
 
 		public override bool CheckDirty () {
-			bool withinScreen = SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.unityCamera, _radius);
+			bool withinScreen = SHelper.CheckWithinScreen(position, _losCamera.unityCamera, _radius) || !Application.isPlaying;
 			return withinScreen && ((base.CheckDirty () || _radius != _previousRadius || _radius != radius) && radius > 0);
 		}
 
@@ -92,8 +92,10 @@ namespace LOS {
 			
 			for (float degree=_startAngle; degree<_endAngle; degree+=degreeStep) {
 				direction = SMath.DegreeToUnitVector(degree);
-				
-				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit)) {
+
+				float distanceForCheck = Application.isPlaying ? _radius : float.MaxValue - 100;	// 100000 for big number
+
+				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit, distanceForCheck)) {
 					Vector3 hitPoint = hit.point;
 					Collider hitCollider = hit.collider;
 					Vector3 hitNormal = hit.normal;

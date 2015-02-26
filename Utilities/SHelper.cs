@@ -63,8 +63,8 @@ public static class SHelper {
 		trans.localEulerAngles = angle;
 	}
 
-	public static Vector2 GetScreenSizeInWorld () {
-		float height = Camera.main.orthographicSize;
+	public static Vector2 GetScreenSizeInWorld (Camera cam) {
+		float height = cam.orthographicSize;
 		float width = height * Camera.main.aspect;
 		return new Vector2(2 * width, 2 * height);
 	}
@@ -72,7 +72,7 @@ public static class SHelper {
 	public static bool CheckWithinScreen (Vector2 position, Camera camera, float distance) {
 		Vector3 minScreenPosition = camera.WorldToScreenPoint(new Vector2(position.x - distance, position.y - distance));
 		Vector3 screenPosition = camera.WorldToScreenPoint(position);
-		float distanceInScreen = Math.Abs(screenPosition.x - minScreenPosition.x) + Math.Abs(screenPosition.y - minScreenPosition.y);
+		float distanceInScreen = Math.Abs(screenPosition.x - minScreenPosition.x);
 		return !(screenPosition.x + distanceInScreen <= 0 || screenPosition.x - distanceInScreen >= camera.pixelWidth || 
 		         screenPosition.y + distanceInScreen <= 0 || screenPosition.y - distanceInScreen >= camera.pixelHeight);
 	}

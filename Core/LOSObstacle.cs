@@ -33,7 +33,8 @@ namespace LOS {
 		}
 
 		public override bool CheckDirty () {
-			return SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.unityCamera, offScreenDistance) && (base.CheckDirty () || gameObject.layer != _previousLayerMask);
+			bool withinScreen = SHelper.CheckWithinScreen(position, LOSManager.instance.losCamera.unityCamera, offScreenDistance) || !Application.isPlaying;
+			return withinScreen && (base.CheckDirty () || gameObject.layer != _previousLayerMask);
 		}
 
 		public override void UpdatePreviousInfo () {

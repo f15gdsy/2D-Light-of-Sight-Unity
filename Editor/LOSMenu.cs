@@ -64,7 +64,7 @@ namespace LOS.Editor {
 				result = true;
 			}
 			else if (losCameras.Length > 1) {
-				Debug.LogWarning("More than 1 LOSCamera are found in the scene! Please only keep one active.");
+				Debug.LogWarning("More than 2 LOSCamera are found in the scene! Please keep only 1 active.");
 			}
 
 			return result;
