@@ -15,15 +15,16 @@ namespace LOS {
 //		public float collidersExtension = 1.001f;
 
 		[HideInInspector]
-		public Vector2 halfViewboxSize;
+		public Vector2 halfViewboxSize {get {return losCamera.halfViewboxSize;}}
 
 		private static LOSManager _instance;
 
 		private List<LOSObstacle> _obstacles;
 		private List<LOSLightBase> _lights;
-		private List<ViewBoxLine> _viewbox;
 		private Transform _losCameraTrans;
 		private LOSCamera _losCamera;
+		private Transform _losSecondCameraTrans;
+		private LOSCamera _losSecondCamera;
 		private bool _isDirty;
 
 
@@ -83,16 +84,9 @@ namespace LOS {
 		/// Viewbox is the screen rect in world space.
 		/// </summary>
 		/// <value>The viewbox.</value>
-		private List<ViewBoxLine> viewbox {
+		private List<LOSCamera.ViewBoxLine> viewbox {
 			get {
-				if (_viewbox == null) {
-					_viewbox = new List<ViewBoxLine>();
-					for (int i=0; i<4; i++) {
-						_viewbox.Add(new ViewBoxLine());
-					}
-					UpdateViewingBox();
-				}
-				return _viewbox;
+				return losCamera.viewbox;
 			}
 		}
 
@@ -102,11 +96,7 @@ namespace LOS {
 		/// <value>The viewbox corners.</value>
 		public List<Vector3> viewboxCorners {
 			get {
-				List<Vector3> result = new List<Vector3>();
-				foreach (var line in viewbox) {
-					result.Add(line.end);
-				}
-				return result;
+				return losCamera.viewboxCorners;
 			}
 		}
 
@@ -117,11 +107,27 @@ namespace LOS {
 					if (losCameras.Length == 0) {
 						Debug.LogError("No LOSCamera is found in the scene! Please remember to attach LOSCamera to the camera gameobjeect.");
 					}
-					else if (losCameras.Length > 1) {
-						Debug.LogError("More than 1 LOSCamera found!");
-					}
-					else {
+					else if (losCameras.Length == 1) {
 						_losCamera = losCameras[0];
+						_losCamera.mainLOSCamera = true;
+					}
+					else if (losCameras.Length == 2) {
+						foreach (LOSCamera cam in losCameras) {
+							if (cam.mainLOSCamera) {
+								if (_losCamera == null) {
+									_losCamera = cam;
+								}
+								else {
+									Debug.LogError("More than 1 MAIN LOSCamera found!");
+								}
+							}
+						}
+						if (_losCamera == null) {
+							Debug.LogError("No MAIN LOSCamera found!");
+						}
+					}
+					else if (losCameras.Length > 2) {
+						Debug.LogError("More than 2 LOSCamera found!");
 					}
 				}
 				return _losCamera;
@@ -136,7 +142,44 @@ namespace LOS {
 			}
 		}
 
-
+		public LOSCamera losSecondCamera {
+			get {
+				if (_losSecondCamera == null) {
+					var losCameras = FindObjectsOfType<LOSCamera>();
+					if (losCameras.Length == 0) {
+						Debug.LogError("No LOSCamera is found in the scene! Please remember to attach LOSCamera to the camera gameobjeect.");
+					}
+					else if (losCameras.Length == 2) {
+						foreach (LOSCamera cam in losCameras) {
+							if (!cam.mainLOSCamera) {
+								if (_losSecondCamera == null) {
+									_losSecondCamera = cam;
+								}
+								else {
+									Debug.LogError("More than 1 second LOSCamera found!");
+								}
+							}
+						}
+						if (_losSecondCamera == null) {
+							Debug.LogError("No second LOSCamera found!");
+						}
+					}
+					else if (losCameras.Length > 2) {
+						Debug.LogError("More than 2 LOSCamera found!");
+					}
+				}
+				return _losSecondCamera;
+			}
+		}
+		public Transform losSecondCameraTrans {
+			get {
+				if (_losSecondCameraTrans == null) {
+					_losSecondCameraTrans = losSecondCamera.transform;
+				}
+				return _losSecondCameraTrans;
+			}
+		}
+		public bool hasSecondCamera {get {return _losSecondCamera != null;}}
 
 		void Start () {
 			Init();
@@ -174,6 +217,7 @@ namespace LOS {
 			_isDirty = false;
 			
 			losCamera.UpdatePreviousInfo();
+			if (hasSecondCamera) losSecondCamera.UpdatePreviousInfo();
 			
 			foreach (LOSObstacle obstacle in obstacles) {
 				obstacle.UpdatePreviousInfo();
@@ -189,20 +233,8 @@ namespace LOS {
 		}
 
 		private void UpdateViewingBox () {
-			Vector2 screenSize = SHelper.GetScreenSizeInWorld();
-			halfViewboxSize = screenSize / 2 * viewboxExtension;
-
-			Vector2 upperRight = new Vector2(halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(losCameraTrans.position);
-			Vector2 upperLeft = new Vector2(-halfViewboxSize.x, halfViewboxSize.y) + SMath.Vec3ToVec2(losCameraTrans.position);
-			Vector2 lowerLeft = new Vector2(-halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(losCameraTrans.position);
-			Vector2 lowerRight = new Vector2(halfViewboxSize.x, -halfViewboxSize.y) + SMath.Vec3ToVec2(losCameraTrans.position);
-
-			viewbox[0].SetStartEnd(lowerRight, upperRight);		// right
-			viewbox[1].SetStartEnd(upperRight, upperLeft);		// up
-			viewbox[2].SetStartEnd(upperLeft, lowerLeft);	// left
-			viewbox[3].SetStartEnd(lowerLeft, lowerRight);	// down
+			losCamera.UpdateViewingBox();
 		}
-
 		
 		public void AddObstacle (LOSObstacle obstacle) {
 			if (!obstacles.Contains(obstacle)) {
@@ -338,15 +370,15 @@ namespace LOS {
 
 		// ------------End------------
 
-		private class ViewBoxLine {
-			public Vector2 start {get; set;}
-			public Vector2 end {get; set;}
-
-			public void SetStartEnd (Vector2 start, Vector2 end) {
-				this.start = start;
-				this.end = end;
-			}
-		}
+//		private class ViewBoxLine {
+//			public Vector2 start {get; set;}
+//			public Vector2 end {get; set;}
+//
+//			public void SetStartEnd (Vector2 start, Vector2 end) {
+//				this.start = start;
+//				this.end = end;
+//			}
+//		}
 	}
 }
 	
