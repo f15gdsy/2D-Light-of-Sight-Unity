@@ -14,7 +14,7 @@ namespace LOS {
 
 
 		public override bool CheckDirty () {
-			return base.CheckDirty () || LOSManager.instance.losCamera.CheckDirty();
+			return base.CheckDirty () || _losCamera.CheckDirty();
 		}
 
 		protected override float GetMaxLightLength () {
@@ -45,7 +45,7 @@ namespace LOS {
 			for (float degree=_startAngle; degree<_endAngle; degree+=degreeStep) {
 				direction = SMath.DegreeToUnitVector(degree);
 				
-				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit)) {
+				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit, 0)) {
 					Vector3 hitPoint = hit.point;
 					Collider hitCollider = hit.collider;
 					Vector3 hitNormal = hit.normal;
@@ -59,7 +59,7 @@ namespace LOS {
 					}
 					else if (previousCollider != hit.collider) {
 						if (previousCollider == null) {
-							Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+							Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 							
 							meshVertices.Add(farPoint - position);
 							previousVectexIndex = currentVertexIndex;
@@ -101,7 +101,7 @@ namespace LOS {
 				}
 				else {
 					if (degree == _startAngle) {
-						Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+						Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 						
 						meshVertices.Add(farPoint - position);
 						previousVectexIndex = currentVertexIndex;
@@ -113,7 +113,7 @@ namespace LOS {
 						currentVertexIndex = meshVertices.Count - 1;
 						AddNewTriangle (triangles, 0, currentVertexIndex, previousVectexIndex);
 						
-						Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+						Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 						
 						meshVertices.Add(farPoint - position);
 						previousVectexIndex = currentVertexIndex;
@@ -130,7 +130,7 @@ namespace LOS {
 			if (coneAngle == 0) {
 				if (previousCollider == null) {
 					if (raycastHitAtStartAngle) {
-						Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+						Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 						
 						meshVertices.Add(farPoint - position);
 						previousVectexIndex = currentVertexIndex;
@@ -152,7 +152,7 @@ namespace LOS {
 			}
 			else {
 				if (previousCollider == null) {
-					Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+					Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 					
 					meshVertices.Add(farPoint - position);
 					previousVectexIndex = currentVertexIndex;
@@ -205,17 +205,17 @@ namespace LOS {
 				direction = SMath.DegreeToUnitVector(degree);
 				
 				if (degree == _startAngle) {
-					firstFarPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+					firstFarPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 					invertAngledMeshVertices.Add(firstFarPoint - position);
 					firstFarPointIndex = invertAngledMeshVertices.Count - 1;
 				}
 				else if (degree + degreeStep >= _endAngle) {		// degree == _endAngle - degreeStep
-					lastFarPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+					lastFarPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 					invertAngledMeshVertices.Add(lastFarPoint - position);
 					lastFarPointIndex = invertAngledMeshVertices.Count - 1;
 				}
 				
-				if (Physics.Raycast(position, direction, out hit, _raycastDistance, obstacleLayer) && CheckRaycastHit(hit)) {		// Hit a collider.
+				if (Physics.Raycast(position, direction, out hit, _raycastDistance, obstacleLayer) && CheckRaycastHit(hit, 0)) {		// Hit a collider.
 					Vector3 hitPoint = hit.point;
 					Collider hitCollider = hit.collider;
 					Vector3 hitNormal = hit.normal;
@@ -275,7 +275,7 @@ namespace LOS {
 					}
 					else {
 						if (null == previousCollider) {
-							Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, previousDirection);
+							Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, previousDirection);
 							invertAngledMeshVertices.Add(farPoint - position);
 							previousFarPointIndex = farPointIndex;
 							farPointIndex = invertAngledMeshVertices.Count - 1;
@@ -291,7 +291,7 @@ namespace LOS {
 						else if (previousCollider != hitCollider) {
 							colliderClosePointCount = 1;
 							
-							Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+							Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 							invertAngledMeshVertices.Add(farPoint - position);
 							previousFarPointIndex = farPointIndex;
 							farPointIndex = invertAngledMeshVertices.Count - 1;
@@ -366,14 +366,14 @@ namespace LOS {
 						closePointIndex = invertAngledMeshVertices.Count - 1;
 						AddNewTriangle(invertAngledTriangles, closePointIndex, farPointIndex, previousClosePointIndex);
 						
-						Vector3 farPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, direction);
+						Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 						invertAngledMeshVertices.Add(farPoint - position);
 						previousFarPointIndex = farPointIndex;
 						farPointIndex = invertAngledMeshVertices.Count - 1;
 						
 						Vector3 previousFarPoint = invertAngledMeshVertices[previousFarPointIndex] + position;
 						Vector3 closePoint = invertAngledMeshVertices[closePointIndex] + position;
-						List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(previousFarPoint, closePoint, position, false);
+						List<Vector3> corners = _losCamera.GetViewboxCornersBetweenPoints(previousFarPoint, closePoint, position, false);
 						switch (corners.Count) {
 						case 0:
 							AddNewTriangle(invertAngledTriangles, closePointIndex, farPointIndex, previousFarPointIndex);
@@ -402,7 +402,7 @@ namespace LOS {
 			if (_startAngle == 0 && _endAngle == 360) {
 				if (previousCollider != null) {
 					if (closePointAtDegree0Index == -1) {
-						Vector3 degree0FarPoint = LOSManager.instance.GetCollisionPointWithViewBox(position, new Vector3(1, 0, 0));
+						Vector3 degree0FarPoint = _losCamera.GetCollisionPointWithViewBox(position, new Vector3(1, 0, 0));
 						invertAngledMeshVertices.Add(degree0FarPoint - position);
 						int degree0FarPointIndex = invertAngledMeshVertices.Count - 1;
 					

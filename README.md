@@ -16,7 +16,8 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 1. Can cope with any shape, as long as the corresponding collider is attached with the object.
 2. Has [radial shadow mode] (https://dl.dropboxusercontent.com/u/27907965/images/los_2.png), and [fullscreen shadow mode] (https://dl.dropboxusercontent.com/u/27907965/images/los_1.png).
 3. Event system. Objects can be notified if it gets lit or gets unlit.
-4. All features are supported by Unity #FREE# version!!!
+4. Can work with perspective camera too. (Tested with topdown view, not tested with 45 degree isometric view)
+5. All features are supported by Unity #FREE# version!!!
 
 #### How to use:
 1. Set camera. Place LOSCamera script on the camera that is used to render the shadow. (Or ignore this step if you only have one camera, the editor will do the work for you.)
@@ -24,18 +25,18 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 3. Create an obstacle. Create any premitive or sprites, and attach Unity collider to them. Then attach LOSObstacle script to the gameobject. Also don't forget to set its layer to match what's set in step 2.
 4. Adjust degree step to match the precision you want.
 
-#### Tips:
+#### Tips & Tricks:
 1. Sometimes for moving lights, the degree step (which stands for precision) should be set lower, something like 0.1f or 0.2f would be good enough. However, the smaller the degree step (better precision), usually means more costly. I'm planning to work on better scene management to improve this.
 2. The Full Screen Light requires its position is within the camera so that to work properly.
 3. Currently it only supports 3D colliders, however, I'm planing to make it work on 2D colliders too. It should not be too difficult.
+4. If you want to use perspective camera to render effects like [Teleglitch] (https://www.youtube.com/watch?v=7tcxT_WxItE), and orthographic camera to render line of sight normally, you can use orthographic camera as LOSCamera, but render Teleglitch shadow using perspective camera (by playing with layer mask).
 
 
 <br>
 
 ## TODO in the next version
 1. Add APIs for toggling the lighting & event system on off.
-2. Event source in cone shape
-3. Add in a multiply shader that works with a shadow mask to create the effect of invert mode.
+2. Add suport for 2D colliders.
 
 <br>
 

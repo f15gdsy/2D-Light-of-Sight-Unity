@@ -69,8 +69,10 @@ namespace LOS {
 				_mesh = new Mesh();
 				meshFilter.mesh = _mesh;
 			}
-			
-			Vector2 screenSize = SHelper.GetScreenSizeInWorld(position.z);
+
+			_losCamera = LOSManager.instance.losCamera;
+
+			Vector2 screenSize = SHelper.GetScreenSizeInWorld(_losCamera.unityCamera);
 			_raycastDistance = Mathf.Sqrt(screenSize.x*screenSize.x + screenSize.y*screenSize.y);
 		}
 
@@ -195,7 +197,7 @@ namespace LOS {
 			Vector3 pointA = vertices[pointAIndex] + position;
 			Vector3 pointB = vertices[pointBIndex] + position;
 			
-			List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(pointA, pointB, position, give4CornersWhenAEqualsB);
+			List<Vector3> corners = _losCamera.GetViewboxCornersBetweenPoints(pointA, pointB, position, give4CornersWhenAEqualsB);
 			switch (corners.Count) {
 			case 0:
 				break;
@@ -219,7 +221,7 @@ namespace LOS {
 			Vector3 pointA = vertices[pointAIndex] + position;
 			Vector3 pointB = vertices[pointBIndex] + position;
 
-			List<Vector3> corners = LOSManager.instance.GetViewboxCornersBetweenPoints(pointA, pointB, position, give4CornersWhenAEqualB);
+			List<Vector3> corners = _losCamera.GetViewboxCornersBetweenPoints(pointA, pointB, position, give4CornersWhenAEqualB);
 			switch (corners.Count) {
 			case 0:
 				AddNewTriangle(triangles, pointAIndex, centerIndex, pointBIndex);
@@ -263,7 +265,7 @@ namespace LOS {
 		}
 
 		protected float GetMinRaycastDistance () {
-			Vector3 screenSize = SHelper.GetScreenSizeInWorld(position.z);
+			Vector3 screenSize = SHelper.GetScreenSizeInWorld(_losCamera.unityCamera);
 			return screenSize.magnitude;
 		}
 
@@ -290,9 +292,9 @@ namespace LOS {
 			}
 		}
 
-		protected bool CheckRaycastHit (RaycastHit hit) {
+		protected bool CheckRaycastHit (RaycastHit hit, float distance) {
 			Vector3 hitPoint = hit.point;
-			return LOSManager.instance.CheckPointWithinViewingBox(hitPoint);
+			return _losCamera.CheckPointWithinViewingBox(hitPoint, distance);
 		}
 
 		protected void UpdateColor () {
