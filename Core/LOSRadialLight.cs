@@ -38,6 +38,9 @@ namespace LOS {
 			}
 		}
 
+		// Cache
+		private bool _withinScreen;
+
 
 		protected override void Awake () {
 			base.Awake ();
@@ -58,7 +61,10 @@ namespace LOS {
 
 		public override bool CheckDirty () {
 			bool withinScreen = SHelper.CheckWithinScreen(position, _losCamera.unityCamera, _radius) || !Application.isPlaying;
-			return withinScreen && ((base.CheckDirty () || _radius != _previousRadius || _radius != radius) && radius > 0);
+			bool dirty = withinScreen && ((base.CheckDirty () || _radius != _previousRadius || _radius != radius) && radius > 0);
+			dirty = dirty || (withinScreen && !_withinScreen);
+			_withinScreen = withinScreen;
+			return dirty;
 		}
 
 		public override void UpdatePreviousInfo () {
