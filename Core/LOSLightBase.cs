@@ -51,7 +51,7 @@ namespace LOS {
 		protected LayerMask _previousObstacleLayer;
 		protected bool _previousInvertMode;
 		protected float _previousDegreeStep;
-
+		protected LOSCamera _losCamera;
 
 
 		protected override void Awake () {
