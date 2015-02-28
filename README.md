@@ -37,6 +37,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 ## TODO in the next version
 1. Add APIs for toggling the lighting & event system on off.
 2. Add suport for 2D colliders.
+3. Add callback function for LOSEventSource.
 
 <br>
 
