@@ -12,11 +12,21 @@ namespace LOS.Event {
 		public LOSLightBase lightSource;
 		public LayerMask triggerLayers;
 		public LayerMask obstacleLayers;
+
+		[Tooltip ("Event source detect range.")]
 		public float distance;
+
+
+		public delegate void HandleTriggersDelegate (List<LOSEventTrigger> triggers);
+		public event HandleTriggersDelegate OnNewTriggersDetected;
+		public event HandleTriggersDelegate OnTriggersExitDetected;
+
+		private List<LOSEventTrigger> _triggeredTriggers;
 
 
 		void Awake () {
 			_trans = transform;
+			_triggeredTriggers = new List<LOSEventTrigger>();
 		}
 
 		void OnEnable () {
@@ -27,6 +37,13 @@ namespace LOS.Event {
 			if (LOSEventManager.TryGetInstance() != null) {
 				LOSEventManager.instance.RemoveEventSource(this);
 			}
+		}
+
+		public void Clear () {
+			if (OnTriggersExitDetected != null) {
+				OnTriggersExitDetected(_triggeredTriggers);
+			}
+			_triggeredTriggers.Clear();
 		}
 
 		public void Process (List<LOSEventTrigger> triggers) {
@@ -80,13 +97,33 @@ namespace LOS.Event {
 
 			}
 
+			List<LOSEventTrigger> newTriggers = new List<LOSEventTrigger>();
 			foreach (LOSEventTrigger trigger in triggeredTriggers) {
 				trigger.TriggeredBySource(this);
+
+				if (!_triggeredTriggers.Contains(trigger)) {
+					newTriggers.Add(trigger);
+				}
+			}
+			if (OnNewTriggersDetected != null && newTriggers.Count > 0) {
+				OnNewTriggersDetected(newTriggers);
+			}
+
+			List<LOSEventTrigger> triggersExit = new List<LOSEventTrigger>();
+			foreach (LOSEventTrigger trigger in _triggeredTriggers) {
+				if (!triggeredTriggers.Contains(trigger)) {
+					triggersExit.Add(trigger);
+				}
+			}
+			if (OnTriggersExitDetected != null && triggersExit.Count > 0) {
+				OnTriggersExitDetected(triggersExit);
 			}
 
 			foreach (LOSEventTrigger trigger in notTriggeredTriggers) {
 				trigger.NotTriggeredBySource(this);
 			}
+
+			_triggeredTriggers = triggeredTriggers;
 		}
 	}
 

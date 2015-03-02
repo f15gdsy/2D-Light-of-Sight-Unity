@@ -106,6 +106,13 @@ namespace LOS {
 		}
 
 
+		public void ToggleOnOff (bool on) {
+			if (renderer) {
+				renderer.enabled = on;
+			}
+		}
+
+
 		public void TryDraw () {
 			if (LOSManager.instance.CheckDirty() || CheckDirty()) {
 				UpdatePreviousInfo();

@@ -53,6 +53,19 @@ namespace LOS.Event {
 			_sources = new List<LOSEventSource>();
 			_triggers = new List<LOSEventTrigger>();
 		}
+
+		void OnEnable () {
+
+		}
+
+		void OnDisable () {
+			foreach (var trigger in _triggers) {
+				trigger.NotTriggered();
+			}
+			foreach (var source in _sources) {
+				source.Clear();
+			}
+		}
 		
 		void Update () {
 			_timeSinceLastUpdate += Time.deltaTime;

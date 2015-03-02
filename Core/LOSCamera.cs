@@ -147,7 +147,6 @@ namespace LOS {
 		public bool CheckPointWithinViewingBox (Vector2 point, float distance) {
 			return !(point.x <= -halfViewboxSize.x + _trans.position.x - distance || point.x >= halfViewboxSize.x + _trans.position.x + distance||
 			         point.y <= -halfViewboxSize.y + _trans.position.y - distance|| point.y >= halfViewboxSize.y + _trans.position.y + distance);
-			return true;
 		}
 
 		public class ViewBoxLine {
