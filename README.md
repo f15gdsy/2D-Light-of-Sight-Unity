@@ -36,7 +36,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 
 ## TODO in the next version
 1. Add suport for 2D colliders.
-2. Support for Unity 5.
+2. Support for Unity 5. Currently in Unity 5, full screen light has issue with capsule collider, but other parts works fine.
 
 
 <br>
