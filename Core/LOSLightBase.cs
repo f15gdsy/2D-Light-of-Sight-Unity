@@ -78,8 +78,8 @@ namespace LOS {
 
 		protected virtual void OnEnable () {
 			LOSManager.instance.AddLight(this);
-			if (renderer != null) {
-				renderer.enabled = true;
+			if (GetComponent<Renderer>() != null) {
+				GetComponent<Renderer>().enabled = true;
 			}
 		}
 
@@ -87,28 +87,28 @@ namespace LOS {
 			if (LOSManager.TryGetInstance() != null) {
 				LOSManager.instance.RemoveLight(this);
 			}
-			if (renderer != null) {
-				renderer.enabled = false;
+			if (GetComponent<Renderer>() != null) {
+				GetComponent<Renderer>().enabled = false;
 			}
 		}
 
 
 		void Start () {
-			if (renderer == null) {
+			if (GetComponent<Renderer>() == null) {
 				gameObject.AddComponent<MeshRenderer>();
 			}
 
 			UpdateSortingOrder();
 			UpdateSortingLayer();
-			renderer.material = material;
+			GetComponent<Renderer>().material = material;
 
 			TryDraw();
 		}
 
 
 		public void ToggleOnOff (bool on) {
-			if (renderer) {
-				renderer.enabled = on;
+			if (GetComponent<Renderer>()) {
+				GetComponent<Renderer>().enabled = on;
 			}
 		}
 
@@ -315,12 +315,12 @@ namespace LOS {
 		}
 
 		protected void UpdateSortingLayer () {
-			renderer.sortingLayerID = sortingLayer;
+			GetComponent<Renderer>().sortingLayerID = sortingLayer;
 			_previousSortingLayer = sortingLayer;
 		}
 
 		protected void UpdateSortingOrder () {
-			renderer.sortingOrder = orderInLayer;
+			GetComponent<Renderer>().sortingOrder = orderInLayer;
 			_previousOrderInLayer = orderInLayer;
 		}
 

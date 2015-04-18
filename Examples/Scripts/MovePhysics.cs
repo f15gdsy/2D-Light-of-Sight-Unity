@@ -10,7 +10,7 @@ public class MovePhysics : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		_rigid = rigidbody;
+		_rigid = GetComponent<Rigidbody>();
 	}
 	
 	void FixedUpdate () {

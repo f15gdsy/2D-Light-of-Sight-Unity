@@ -11,7 +11,7 @@ public class ChangeColorOnLOSEvent : MonoBehaviour {
 	private SpriteRenderer _renderer;
 
 	void Start () {
-		_renderer = (SpriteRenderer) renderer;
+		_renderer = (SpriteRenderer) GetComponent<Renderer>();
 
 		LOSEventTrigger trigger = GetComponent<LOSEventTrigger>();
 		trigger.OnNotTriggered += OnNotLit;

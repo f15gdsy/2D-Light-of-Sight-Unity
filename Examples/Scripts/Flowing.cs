@@ -12,7 +12,7 @@ public class Flowing : MonoBehaviour {
 
 	void Start () {
 		_time = interval / 2;
-		_rigid = rigidbody;
+		_rigid = GetComponent<Rigidbody>();
 		_direction = new Vector3(0, 1, 0);
 	}
 	
