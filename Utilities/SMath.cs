@@ -9,11 +9,11 @@ public static class SMath {
 	public static Vector3 Vec2ToVec3 (Vector2 origin, float z) {
 		return new Vector3(origin.x, origin.y, z);
 	}
-
+	
 	public static Vector3 Vec2ToVec3 (Vector2 origin) {
 		return new Vector3(origin.x, origin.y, 0);
 	}
-
+	
 	public static float Clamp (float min, float target, float max) {
 		target = Mathf.Max(min, target);
 		target = Mathf.Min(max, target);
@@ -24,23 +24,27 @@ public static class SMath {
 		return Mathf.Abs(pos1.x - pos2.x) + Mathf.Abs(pos1.y - pos2.y);
 	}
 	
-	public static Vector2 GetBezierPoint2 (float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) {
-		float u = 1 - t;
-		float tt = t * t;
+	public static Vector2 GetBezierPoint2 (float ratio, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) {
+		float u = 1 - ratio;
+		float tt = ratio * ratio;
 		float uu = u * u;
 		float uuu = uu * u;
-		float ttt = tt * t;
+		float ttt = tt * ratio;
 		
 		Vector2 p = uuu * p0;
-		p += 3 * uu * t * p1;
+		p += 3 * uu * ratio * p1;
 		p += 3 * u * tt * p2;
 		p += ttt * p3;
 		
 		return p;
 	}
 	
-	public static Vector2 GetBezierPoint2 (float t, Vector2 p0, Vector2 p1, Vector2 p2) {
-		return (1-t)*(1-t)*p0 + 2*(1-t)*t*p1 + t*t*p2;
+	public static Vector2 GetBezierPoint2 (float ratio, Vector2 p0, Vector2 p1, Vector2 p2) {
+		return (1-ratio)*(1-ratio)*p0 + 2*(1-ratio)*ratio*p1 + ratio*ratio*p2;
+	}
+	
+	public static Vector3 GetBezierPoint3 (float ratio, Vector3 p0, Vector3 p1, Vector3 p2) {
+		return (1-ratio)*(1-ratio)*p0 + 2*(1-ratio)*ratio*p1 + ratio*ratio*p2;
 	}
 	
 	public static float GetBezierPoint2Angle (float t, Vector2 p0, Vector2 p1, Vector2 p2) {
@@ -123,11 +127,11 @@ public static class SMath {
 		return degree;
 	}
 	
-	public static Vector2 GetPerpendicular2 (Vector2 origin, bool ccw) {
+	public static Vector2 GetPerpendicular2 (Vector2 origin, bool isLeft) {
 		Vector2 perpendicular = Vector2.zero;
 		int quadrant = GetQuadrant(origin);
 		
-		if (ccw) {
+		if (isLeft) {
 			switch (quadrant) {
 			case 0:
 				if (origin.y == 0) {
@@ -194,7 +198,7 @@ public static class SMath {
 			else return 3;	
 		}
 	}
-
+	
 	public static LineSituation IsBetween (Vector2 left, Vector2 target, Vector2 right) {	// 3 lines start from the same point
 		Vector2 leftPerpendicular = SMath.GetPerpendicular2(left, true);
 		if (Vector2.Dot(leftPerpendicular, target) < 0) {	// to the right of left line
@@ -236,17 +240,24 @@ public static class SMath {
 		}
 		return degree;
 	}
-
+	
 	public static bool CheckSamePoint (Vector2 p1, Vector2 p2, float tolerance) {
 		return CheckSamePoint(SMath.Vec2ToVec3(p1), SMath.Vec2ToVec3(p2), tolerance);
 	}
-
+	
 	public static bool CheckSamePoint (Vector3 p1, Vector3 p2, float tolerance) {
 		return (p1 - p2).sqrMagnitude <= tolerance * tolerance;
 	}
-
+	
 	public static float CrossProduct2D (Vector2 p, Vector2 q) {
 		return p.x * q.y - p.y * q.x;
+	}
+	
+	public static Vector3 RotatePointAroundPivot (Vector3 point, Vector3 pivot, Vector3 angles) {
+		Vector3 direction = point - pivot;
+		direction = Quaternion.Euler(angles) * direction;	// rotate it
+		point = direction + pivot;
+		return point;
 	}
 }
 
