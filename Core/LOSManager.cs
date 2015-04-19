@@ -141,7 +141,9 @@ namespace LOS {
 
 		void OnDisable () {
 			foreach (var light in lights) {
-				light.ToggleOnOff(false);
+				if (light != null) {
+					light.ToggleOnOff(false);
+				}
 			}
 		}
 
