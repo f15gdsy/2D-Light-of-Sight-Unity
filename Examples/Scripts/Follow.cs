@@ -16,6 +16,8 @@ public class Follow : MonoBehaviour {
 
 	// Update is called once per frame
 	void LateUpdate () {
+		if (targetTrans == null) return ;
+
 		if (freezeZ) {
 			Vector3 pos = targetTrans.position;
 			pos.z = _trans.position.z;
