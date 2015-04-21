@@ -6,6 +6,7 @@
 ## Demo
 1. [Radial Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/RadialLightDemo/RadialLightDemo.html)
 2. [Fullscreen Shadow] (https://dl.dropboxusercontent.com/u/27907965/games/LOS/FullScreenLightDemo/FullScreenLightDemo.html)
+3. [Ludum Dare #32 entry: "Long Live The Great Leader!"] (http://ludumdare.com/compo/ludum-dare-32/?action=preview&uid=24851)
 
 <br>
 
