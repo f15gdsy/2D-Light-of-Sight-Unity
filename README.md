@@ -30,7 +30,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 1. Sometimes for moving lights, the degree step (which stands for precision) should be set lower, something like 0.1f or 0.2f would be good enough. However, the smaller the degree step (better precision), usually means more costly. I'm planning to work on better scene management to improve this.
 2. The Full Screen Light requires its position is within the camera so that to work properly.
 3. Currently it only supports 3D colliders, however, I'm planing to make it work on 2D colliders too. It should not be too difficult.
-4. If you want to use perspective camera to render effects like [Teleglitch] (https://www.youtube.com/watch?v=7tcxT_WxItE), and orthographic camera to render line of sight normally, you can use orthographic camera as LOSCamera, but render Teleglitch shadow using perspective camera (by playing with layer mask).
+4. If you want to use perspective camera to render effects like [my LD#32 game] (http://ludumdare.com/compo/ludum-dare-32/?action=preview&uid=24851), you can use orthographic camera to render other things normally, and render shadow using perspective camera (by playing with layer mask).
 
 
 <br>
