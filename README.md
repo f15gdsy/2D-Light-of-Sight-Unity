@@ -31,6 +31,7 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 2. The Full Screen Light requires its position is within the camera so that to work properly.
 3. Currently it only supports 3D colliders, however, I'm planing to make it work on 2D colliders too. It should not be too difficult.
 4. If you want to use perspective camera to render effects like [my LD#32 game] (http://ludumdare.com/compo/ludum-dare-32/?action=preview&uid=24851), you can use orthographic camera to render other things normally, and render shadow using perspective camera (by playing with layer mask).
+5. With Unity5 and above, you can blur the edge of the lights & shadows! Check out [the blured version of full screen light] (https://dl.dropboxusercontent.com/u/27907965/images/LOS/Screen%20Shot%202015-04-23%20at%205.38.45%20pm.png). Here is how it works: render the light in a separate camera which has blur image effect component attached. One thing to note is that, this camera should be rendered at last (by setting the camera's Depth low). So the background (not blured) actually rendered before the light, but I just made the background semi-transparent to make the light visible. You can check out the Full Screen Light Blur example in the plugin.
 
 
 <br>
