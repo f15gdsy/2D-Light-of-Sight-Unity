@@ -10,12 +10,18 @@ namespace LOS {
 	/// </summary>
 	[ExecuteInEditMode]
 	public class LOSManager : MonoBehaviour {
+		public PhysicsOpt physicsOpt;
 		public float viewboxExtension = 1.01f;
 		public bool debugMode;
+
+		
 //		public float collidersExtension = 1.001f;
 
 		[HideInInspector]
 		public Vector2 halfViewboxSize {get {return losCamera.halfViewboxSize;}}
+
+		[HideInInspector]
+		public bool is2D {get {return physicsOpt == PhysicsOpt.Physics_2D;}}
 
 		private static LOSManager _instance;
 
@@ -237,6 +243,12 @@ namespace LOS {
 
 
 		// ------------End------------
+
+
+		public enum PhysicsOpt {
+			Physics_3D,
+			Physics_2D,
+		}
 
 //		private class ViewBoxLine {
 //			public Vector2 start {get; set;}

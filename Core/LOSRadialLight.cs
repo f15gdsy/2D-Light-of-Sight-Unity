@@ -87,9 +87,9 @@ namespace LOS {
 			bool raycastHitAtStartAngle = false;
 			Vector3 direction = Vector3.zero;
 			Vector3 previousNormal = Vector3.zero;
-			Collider previousCollider = null;
+			object previousHitGo = null;
 			float distance = _radius;
-			RaycastHit hit;
+			LOSRaycastHit hit;
 			int currentVertexIndex = -1;
 			int previousVectexIndex = -1;
 			Vector3 previousTempPoint = Vector3.zero;
@@ -101,9 +101,9 @@ namespace LOS {
 
 				float distanceForCheck = Application.isPlaying ? _radius : float.MaxValue - 100;	// 100000 for big number
 
-				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit, distanceForCheck)) {
+				if (LOSRaycast(direction, out hit, distance) && CheckRaycastHit(hit, distanceForCheck)) {
 					Vector3 hitPoint = hit.point;
-					Collider hitCollider = hit.collider;
+					GameObject hitGo = hit.hitGo;
 					Vector3 hitNormal = hit.normal;
 					
 					if (degree == _startAngle) {
@@ -113,8 +113,8 @@ namespace LOS {
 						currentVertexIndex = meshVertices.Count - 1;
 						
 					}
-					else if (previousCollider != hit.collider) {
-						if (previousCollider == null) {
+					else if (previousHitGo != hitGo) {
+						if (previousHitGo == null) {
 							meshVertices.Add(hitPoint - position);
 							previousVectexIndex = currentVertexIndex;
 							currentVertexIndex = meshVertices.Count - 1;
@@ -144,7 +144,7 @@ namespace LOS {
 						AddNewTriangle (triangles, 0, currentVertexIndex, previousVectexIndex);
 					}
 					
-					previousCollider = hitCollider;
+					previousHitGo = hitGo;
 					previousTempPoint = hitPoint;
 					previousNormal = hitNormal;
 				}
@@ -156,7 +156,7 @@ namespace LOS {
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
 					}
-					else if (previousCollider != null) {
+					else if (previousHitGo != null) {
 						meshVertices.Add(previousTempPoint - position);
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
@@ -177,13 +177,13 @@ namespace LOS {
 						currentVertexIndex = meshVertices.Count - 1;
 						AddNewTriangle(triangles, 0, currentVertexIndex, previousVectexIndex);
 					}
-					previousCollider = null;
+					previousHitGo = null;
 					//					previousTempPoint = farPoint;
 				}
 			}
 			
 			if (coneAngle == 0) {
-				if (previousCollider == null) {
+				if (previousHitGo == null) {
 					if (raycastHitAtStartAngle) {
 						Vector3 farPoint = LOSManager.instance.GetPointForRadius(position, direction, distance);
 						
@@ -205,7 +205,7 @@ namespace LOS {
 				}
 			}
 			else {
-				if (previousCollider == null) {
+				if (previousHitGo == null) {
 					Vector3 farPoint = LOSManager.instance.GetPointForRadius(position, direction, distance);
 					
 					meshVertices.Add(farPoint - position);

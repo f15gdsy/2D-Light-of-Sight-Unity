@@ -299,7 +299,35 @@ namespace LOS {
 			}
 		}
 
-		protected bool CheckRaycastHit (RaycastHit hit, float distance) {
+		protected bool LOSRaycast (Vector3 direction, out LOSRaycastHit hit, float distance) {
+			hit = new LOSRaycastHit();
+
+			if (LOSManager.instance.physicsOpt == LOSManager.PhysicsOpt.Physics_3D) {
+				RaycastHit hit3D;
+
+				if (Physics.Raycast(position, direction, out hit3D, distance, obstacleLayer)) {
+					hit.point = hit3D.point;
+					hit.normal = hit3D.normal;
+					hit.distance = hit3D.distance;
+					hit.hitGo = hit3D.collider.gameObject;
+					return true;
+				}
+			}
+			else {
+				RaycastHit2D hit2D = Physics2D.Raycast(position, direction, distance, obstacleLayer);
+				if (hit2D.collider != null) {
+					hit.point = hit2D.point;
+					hit.normal = hit2D.normal;
+					hit.distance = hit2D.distance;
+					hit.hitGo = hit2D.collider.gameObject;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		protected bool CheckRaycastHit (LOSRaycastHit hit, float distance) {
 			Vector3 hitPoint = hit.point;
 			return _losCamera.CheckPointWithinViewingBox(hitPoint, distance);
 		}
@@ -350,6 +378,14 @@ namespace LOS {
 
 			UpdateColor();
 			UpdateUVs(verticesArray);
+		}
+
+
+		protected struct LOSRaycastHit {
+			public Vector3 point;
+			public Vector3 normal;
+			public float distance;
+			public GameObject hitGo;
 		}
 	}
 }

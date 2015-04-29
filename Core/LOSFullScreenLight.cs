@@ -28,9 +28,9 @@ namespace LOS {
 			bool raycastHitAtStartAngle = false;
 			Vector3 direction = Vector3.zero;
 			Vector3 previousNormal = Vector3.zero;
-			Collider previousCollider = null;
+			object previousHitGo = null;
 			float distance = GetMinRaycastDistance();
-			RaycastHit hit;
+			LOSRaycastHit hit;
 			int currentVertexIndex = -1;
 			int previousVectexIndex = -1;
 			Vector3 previousTempPoint = Vector3.zero;
@@ -45,9 +45,9 @@ namespace LOS {
 			for (float degree=_startAngle; degree<_endAngle; degree+=degreeStep) {
 				direction = SMath.DegreeToUnitVector(degree);
 				
-				if (Physics.Raycast(position, direction, out hit, distance, obstacleLayer) && CheckRaycastHit(hit, 0)) {
+				if (LOSRaycast(direction, out hit, distance) && CheckRaycastHit(hit, 0)) {
 					Vector3 hitPoint = hit.point;
-					Collider hitCollider = hit.collider;
+					object hitGo = hit.hitGo;
 					Vector3 hitNormal = hit.normal;
 					
 					if (degree == _startAngle) {
@@ -57,8 +57,8 @@ namespace LOS {
 						currentVertexIndex = meshVertices.Count - 1;
 						
 					}
-					else if (previousCollider != hit.collider) {
-						if (previousCollider == null) {
+					else if (previousHitGo != hitGo) {
+						if (previousHitGo == null) {
 							Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 							
 							meshVertices.Add(farPoint - position);
@@ -95,7 +95,7 @@ namespace LOS {
 						AddNewTriangle (triangles, 0, currentVertexIndex, previousVectexIndex);
 					}
 					
-					previousCollider = hitCollider;
+					previousHitGo = hitGo;
 					previousTempPoint = hitPoint;
 					previousNormal = hitNormal;
 				}
@@ -107,7 +107,7 @@ namespace LOS {
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
 					}
-					else if (previousCollider != null) {
+					else if (previousHitGo != null) {
 						meshVertices.Add(previousTempPoint - position);
 						previousVectexIndex = currentVertexIndex;
 						currentVertexIndex = meshVertices.Count - 1;
@@ -122,13 +122,13 @@ namespace LOS {
 						
 						
 					}
-					previousCollider = null;
+					previousHitGo = null;
 					//					previousTempPoint = farPoint;
 				}
 			}
 			
 			if (coneAngle == 0) {
-				if (previousCollider == null) {
+				if (previousHitGo == null) {
 					if (raycastHitAtStartAngle) {
 						Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 						
@@ -151,7 +151,7 @@ namespace LOS {
 				}
 			}
 			else {
-				if (previousCollider == null) {
+				if (previousHitGo == null) {
 					Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
 					
 					meshVertices.Add(farPoint - position);
@@ -177,9 +177,9 @@ namespace LOS {
 			
 			Vector3 previousNormal = Vector3.zero;
 			Vector3 normalAtDegree0 = Vector3.zero;
-			Collider previousCollider = null;
-			Collider previousPreviousCollider = null;
-			Collider colliderAtDegree0 = null;
+			GameObject previousHitGo = null;
+			GameObject previousPreviousHitGo = null;
+			GameObject hitGoAtDegree0 = null;
 			Vector3 firstFarPoint = Vector3.zero;
 			Vector3 lastFarPoint = Vector3.zero;
 			Vector3 previousCloseTempPoint = Vector3.zero;
@@ -192,8 +192,8 @@ namespace LOS {
 			int previousClosePointIndex = -1;
 			int closePointAtDegree0Index = -1;
 			int colliderClosePointCount = 0;
-			RaycastHit hit;
-			RaycastHit previousHit = new RaycastHit();
+			LOSRaycastHit hit;
+			LOSRaycastHit previousHit = new LOSRaycastHit();
 			
 			invertAngledMeshVertices.Add(Vector3.zero);		// Add the position of the light
 			
@@ -218,9 +218,9 @@ namespace LOS {
 					lastFarPointIndex = invertAngledMeshVertices.Count - 1;
 				}
 				
-				if (Physics.Raycast(position, direction, out hit, _raycastDistance, obstacleLayer) && CheckRaycastHit(hit, 0)) {		// Hit a collider.
+				if (LOSRaycast(direction, out hit, _raycastDistance) && CheckRaycastHit(hit, 0)) {		// Hit a collider.
 					Vector3 hitPoint = hit.point;
-					Collider hitCollider = hit.collider;
+					GameObject hitGo = hit.hitGo;
 					Vector3 hitNormal = hit.normal;
 					
 					if (degree == _startAngle) {
@@ -234,7 +234,7 @@ namespace LOS {
 						
 						if (degree == 0) {
 							closePointAtDegree0Index = closePointIndex;
-							colliderAtDegree0 = hitCollider;
+							hitGoAtDegree0 = hitGo;
 							normalAtDegree0 = hitNormal;
 						}
 					}
@@ -242,7 +242,7 @@ namespace LOS {
 						previousFarPointIndex = farPointIndex;
 						farPointIndex = lastFarPointIndex;
 						
-						if (previousCollider != hitCollider && null != previousCollider) {
+						if (previousHitGo != hitGo && null != previousHitGo) {
 							colliderClosePointCount = 1;
 							//							
 							if (_startAngle == 0 && _endAngle == 360) {
@@ -264,7 +264,7 @@ namespace LOS {
 							
 //							AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
 
-							previousPreviousCollider = previousCollider;
+							previousPreviousHitGo = previousHitGo;
 							
 //							Vector3 previouseClosePointTolerated = GetToleratedHitPointColliderOrNormalChange(previousDirection, previousHit, direction, hit);
 //							invertAngledMeshVertices.Add(previouseClosePointTolerated - _trans.position);
@@ -282,7 +282,7 @@ namespace LOS {
 						}
 					}
 					else {
-						if (null == previousCollider) {
+						if (null == previousHitGo) {
 							Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, previousDirection);
 							invertAngledMeshVertices.Add(farPoint - position);
 							previousFarPointIndex = farPointIndex;
@@ -296,7 +296,7 @@ namespace LOS {
 							
 							colliderClosePointCount++;
 						}
-						else if (previousCollider != hitCollider) {
+						else if (previousHitGo != hitGo) {
 							colliderClosePointCount = 1;
 							
 							Vector3 farPoint = _losCamera.GetCollisionPointWithViewBox(position, direction);
@@ -359,12 +359,12 @@ namespace LOS {
 						}
 					}
 					
-					previousCollider = hitCollider;
+					previousHitGo = hitGo;
 					previousCloseTempPoint = hitPoint;
 					previousNormal = hitNormal;
 				}
 				else {
-					if (null != previousCollider) {
+					if (null != previousHitGo) {
 						colliderClosePointCount = 0;
 
 						Vector3 previousCloseTempPointTolerated = GetToleratedHitPointColliderInOut(direction, previousHit);
@@ -401,14 +401,14 @@ namespace LOS {
 						}
 					}
 					
-					previousCollider = null;
+					previousHitGo = null;
 				}
 				previousDirection = direction;
 				previousHit = hit;
 			}
 			
 			if (_startAngle == 0 && _endAngle == 360) {
-				if (previousCollider != null) {
+				if (previousHitGo != null) {
 					if (closePointAtDegree0Index == -1) {
 						Vector3 degree0FarPoint = _losCamera.GetCollisionPointWithViewBox(position, new Vector3(1, 0, 0));
 						invertAngledMeshVertices.Add(degree0FarPoint - position);
@@ -426,8 +426,8 @@ namespace LOS {
 						}
 						else {
 							if (closePointAtDegree0Index != -1 && 
-							    colliderAtDegree0 == previousCollider &&
-							    previousPreviousCollider == previousCollider &&
+							    hitGoAtDegree0 == previousHitGo &&
+							    previousPreviousHitGo == previousHitGo &&
 							    normalAtDegree0 == previousNormal) {
 								AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
 								AddNewTriangle(invertAngledTriangles, closePointIndex, closePointAtDegree0Index, firstFarPointIndex);
@@ -440,7 +440,7 @@ namespace LOS {
 			else {	// Add triangles between outside of view.
 				AddNewTrianglesBetweenPoints4Corners(invertAngledTriangles, invertAngledMeshVertices, lastFarPointIndex, firstFarPointIndex, 0);
 				
-				if (previousCollider != null) {
+				if (previousHitGo != null) {
 					if (colliderClosePointCount >= 2) {
 						AddNewTrianglesBetweenPoints4Corners(invertAngledTriangles, invertAngledMeshVertices, previousFarPointIndex, lastFarPointIndex, closePointIndex);
 						AddNewTriangle(invertAngledTriangles, previousClosePointIndex, closePointIndex, previousFarPointIndex);
@@ -462,11 +462,11 @@ namespace LOS {
 		/// <returns>The hitpoint after calculation. </returns>
 		/// <param name="targetDirection">Target direction.</param>
 		/// <param name="hit">Hit.</param>
-		private Vector3 GetToleratedHitPointColliderInOut (Vector3 targetDirection, RaycastHit hit) {
+		private Vector3 GetToleratedHitPointColliderInOut (Vector3 targetDirection, LOSRaycastHit hit) {
 			return _trans.position + hit.distance * targetDirection.normalized;
 		}
 
-		private Vector3 GetToleratedHitPointColliderOrNormalChange (Vector3 direction1, RaycastHit hit1, Vector3 direction2, RaycastHit hit2) {
+		private Vector3 GetToleratedHitPointColliderOrNormalChange (Vector3 direction1, LOSRaycastHit hit1, Vector3 direction2, LOSRaycastHit hit2) {
 			float sqrDistance1 = (hit1.point - position).sqrMagnitude;
 			float sqrDistance2 = (hit2.point - position).sqrMagnitude;
 
