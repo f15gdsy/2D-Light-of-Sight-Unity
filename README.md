@@ -38,9 +38,9 @@ A 2D dynamic lighting plugin for Unity3d, that is, it achieves something like [t
 
 <br>
 
-## TODO in the next version
+## TODO
 1. Currently in Unity 5, full screen light has issue with capsule collider, but other parts works fine.
-
+2. Directional light.
 
 <br>
 
