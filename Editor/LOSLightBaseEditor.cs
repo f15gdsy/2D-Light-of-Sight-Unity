@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using System.Reflection;
 using UnityEditor;
-using System.Collections;
+using UnityEditorInternal;
 
 namespace LOS.Editor {
 
@@ -52,10 +53,65 @@ namespace LOS.Editor {
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(_color);
-			EditorGUILayout.PropertyField(_sortingLayer);
+			
+		    // Start of Sorting Layer Popup
+            Rect firstHoriz = EditorGUILayout.BeginHorizontal();
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.BeginProperty(firstHoriz, GUIContent.none, _sortingLayer);
+
+            string[] layerNames = GetSortingLayerNames();
+            int[] layerID = GetSortingLayerUniqueIDs();
+
+            int selected = -1;
+            
+            // What is selected?
+            int sID = _sortingLayer.intValue;
+            for (int i = 0; i < layerID.Length; i++)
+            {
+                if (sID == layerID[i])
+                {
+                    selected = i;
+                }
+            }
+
+            // Select Default
+            if (selected == -1)
+            {
+                for (int i = 0; i < layerID.Length; i++)
+                {
+                    if (layerID[i] == 0)
+                    {
+                        selected = i;
+                    }
+                }
+            }
+
+            selected = EditorGUILayout.Popup("Sorting Layer", selected, layerNames);
+
+            //Translate to ID
+            _sortingLayer.intValue = layerID[selected];
+
+            EditorGUI.EndProperty();
+            EditorGUILayout.EndHorizontal();
+            // End of Sorting Layer Popup
+			
 			EditorGUILayout.PropertyField(_orderInLayer);
 			EditorGUILayout.PropertyField(_material);
 		}
+		
+		public string[] GetSortingLayerNames()
+        {
+            var internalEditorUtilityType = typeof(InternalEditorUtility);
+            PropertyInfo sortingLayersProperty = internalEditorUtilityType.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
+            return (string[])sortingLayersProperty.GetValue(null, new object[0]);
+        }
+
+        public int[] GetSortingLayerUniqueIDs()
+        {
+            var internalEditorUtilityType = typeof(InternalEditorUtility);
+            PropertyInfo sortingLayerUniqueIDsProperty = internalEditorUtilityType.GetProperty("sortingLayerUniqueIDs", BindingFlags.Static | BindingFlags.NonPublic);
+            return (int[])sortingLayerUniqueIDsProperty.GetValue(null, new object[0]);
+        }
 	}
 
 }
